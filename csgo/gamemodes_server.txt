@@ -1,0 +1,54 @@
+"GameModes_Server.txt"
+{
+    "gameTypes"
+    {
+        "classic"
+        {
+            "gameModes"
+            {
+                "competitive"
+                {
+                    "maxplayers"    "512"
+
+                    "exec"
+                    {
+                        "exec"      "autoexec.cfg" 
+                    }
+
+                    "mapgroupsMP"
+                    {
+                        "hattrick"  ""
+                    }
+                }
+            }
+        }
+    }
+
+    "mapgroups"
+    {
+        "hattrick"
+        {
+            "name"              "hattrick"
+
+            "maps"
+            {
+                "de_dust2"      ""
+                "de_mirage"     ""
+                "de_inferno"    ""
+                "de_nuke"       ""
+                "de_overpass"   ""
+                "de_cbble"      ""
+                "de_cache"      ""
+                "de_train"      ""
+                "de_vertigo"    ""
+                "de_canals"     ""
+                "de_sugarcane"  ""
+                "de_stmarc"     ""
+                "de_safehouse"  ""
+                "de_bank"       ""
+                "de_lake"       ""
+                "de_shortdust"  ""
+            }
+        }
+    }
+}
