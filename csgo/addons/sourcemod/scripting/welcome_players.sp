@@ -18,13 +18,6 @@
 
 
 /**
- * CUSTOM DEFINITIONS
- */
-
-#define         _PREP_OFFS_(%0,%1,%2)       if (%1 < 1) %1 = _Get_Offs_(%0, %2)
-
-
-/**
  * CUSTOM INFORMATION
  */
 
