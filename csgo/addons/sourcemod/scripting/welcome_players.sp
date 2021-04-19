@@ -5,7 +5,6 @@
 
 #include < sourcemod >
 #include < cstrike >
-#include < regex >
 #include < sdktools >
 #include < sdkhooks >
 
@@ -23,14 +22,6 @@
  */
 
 #define         _PREP_OFFS_(%0,%1,%2)       if (%1 < 1) %1 = _Get_Offs_(%0, %2)
-
-#if !defined    CS_TEAM_T
-#define         CS_TEAM_T                   (2)
-#endif
-
-#if !defined    CS_TEAM_CT
-#define         CS_TEAM_CT                  (3)
-#endif
 
 
 /**

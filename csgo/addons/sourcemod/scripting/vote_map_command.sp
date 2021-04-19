@@ -5,7 +5,6 @@
 
 #include < sourcemod >
 #include < cstrike >
-#include < regex >
 #include < sdktools >
 #include < sdkhooks >
 
