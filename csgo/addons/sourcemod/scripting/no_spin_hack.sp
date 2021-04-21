@@ -40,7 +40,7 @@ static float g_fAng[MAXPLAYERS][3];
 
 
 /**
- * CUSTOM PUBLIC FORWARDS
+ * PUBLIC FORWARDS
  */
 
 public void OnPluginStart()
@@ -84,11 +84,6 @@ public void OnClientDisconnect_Post(int nEntity)
     SDKUnhook(nEntity, SDKHook_OnTakeDamageAlive,   _Take_Damage_Alive_);
 }
 
-
-/**
- * CUSTOM PUBLIC FORWARDS
- */
-
 public Action OnPlayerRunCmd(int nEntity, int& nButtons, int& nImpulse, float fVelocity[3], float fAngles[3], int& nWeapon, int& nSubType, int& nCmdNum, int& nTickCount, int& nSeed, int nMouseDir[2])
 {
     g_fLen[nEntity][0] = fAngles[0] - g_fAng[nEntity][0];
@@ -99,6 +94,11 @@ public Action OnPlayerRunCmd(int nEntity, int& nButtons, int& nImpulse, float fV
     g_fAng[nEntity][1] = fAngles[1];
     g_fAng[nEntity][2] = fAngles[2];
 }
+
+
+/**
+ * CUSTOM PUBLIC FORWARDS
+ */
 
 public Action _Take_Damage_Alive_(int nVictim, int& nAttacker, int& nInflictor, float& fDamage, int& nDamageType, int& nWeapon, float fDamageForce[3], float fDamagePosition[3], int nDamageCustom)
 {
