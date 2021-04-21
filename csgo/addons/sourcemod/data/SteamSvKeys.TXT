@@ -1,0 +1,67 @@
+"SteamSvKeys"
+{
+    "localhost:27015"
+    {
+        "sv_setsteamaccount"    "12ED..."
+    }
+
+    "127.0.0.1:27015"
+    {
+        "sv_setsteamaccount"    "12ED..."
+    }
+
+    "hattrick.go.ro:27015"
+    {
+        "sv_setsteamaccount"    "12ED..."
+    }
+
+    "192.168.100.2:27015"
+    {
+        "sv_setsteamaccount"    "12ED..."
+    }
+
+    "192.168.100.1:27015"
+    {
+        "sv_setsteamaccount"    "12ED..."
+    }
+
+    "86.124.105.50:27015"
+    {
+        "sv_setsteamaccount"    "12ED..."
+    }
+
+
+
+
+
+
+    "localhost:27016"
+    {
+        "sv_setsteamaccount"    "36FF..."
+    }
+
+    "127.0.0.1:27016"
+    {
+        "sv_setsteamaccount"    "36FF..."
+    }
+
+    "hattrick.go.ro:27016"
+    {
+        "sv_setsteamaccount"    "36FF..."
+    }
+
+    "192.168.100.2:27016"
+    {
+        "sv_setsteamaccount"    "36FF..."
+    }
+
+    "192.168.100.1:27016"
+    {
+        "sv_setsteamaccount"    "36FF..."
+    }
+
+    "86.124.105.50:27016"
+    {
+        "sv_setsteamaccount"    "36FF..."
+    }
+}
