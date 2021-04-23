@@ -10,6 +10,16 @@ Windows Process Priority Class
         HIGH_PRIORITY_CLASS             =       128         =       0x80
         REALTIME_PRIORITY_CLASS         =       256         =       0x100
 
+Linux Process Priority Class
+
+    From Low Priority [Worse] To High Priority [Better]
+
+        IDLE_PRIORITY_CLASS             =       -2
+        BELOW_NORMAL_PRIORITY_CLASS     =       -4
+        NORMAL_PRIORITY_CLASS           =       -8
+        ABOVE_NORMAL_PRIORITY_CLASS     =       -12
+        HIGH_PRIORITY_CLASS             =       -16
+        REALTIME_PRIORITY_CLASS         =       -20
 
 Valid Tick Rates
 
