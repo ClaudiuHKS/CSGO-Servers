@@ -19,6 +19,7 @@
 #define _BOT_QUOTA_                 (2) // bot_quota
 #define _SV_FULL_ALLTALK_           (1) // sv_full_alltalk
 #define _SUICIDE_SCORE_             (0) // contributionscore_suicide
+#define _SUICIDE_PENALTY_           (0) // mp_suicide_penalty
 
 #define _STEAM_SV_KEYS_KV_FILE_     "SteamSvKeys.TXT"
 #define _STEAM_SV_KEYS_KV_TITLE_    "SteamSvKeys"
@@ -65,6 +66,7 @@ Handle g_hSvFullAllTalk =               INVALID_HANDLE;
 Handle g_hHostName =                    INVALID_HANDLE;
 Handle g_hSvTags =                      INVALID_HANDLE;
 Handle g_hSuicideScore =                INVALID_HANDLE;
+Handle g_hSuicidePenalty =              INVALID_HANDLE;
 
 int g_nPatchSize =                      -1;
 int g_nPatchOffs =                      -1;
@@ -82,6 +84,7 @@ bool g_bAllTalkConVarChangeHooked =     false;
 bool g_bHostNameConVarChangeHooked =    false;
 bool g_bSvTagsConVarChangeHooked =      false;
 bool g_bSScoreConVarChangeHooked =      false;
+bool g_bSPenConVarChangeHooked =        false;
 
 
 /**
@@ -491,6 +494,11 @@ public void OnMapStart()
         g_hSuicideScore =                           FindConVar("contributionscore_suicide");
     }
 
+    if (g_hSuicidePenalty == INVALID_HANDLE)
+    {
+        g_hSuicidePenalty =                         FindConVar("mp_suicide_penalty");
+    }
+
     if (g_hBotQuota != INVALID_HANDLE)
     {
         if (GetConVarInt(g_hBotQuota) !=            _BOT_QUOTA_)
@@ -560,6 +568,30 @@ public void OnMapStart()
             IntToString(_SUICIDE_SCORE_,            szBuffer, sizeof (szBuffer));
 
             SetConVarString(g_hSuicideScore,        szBuffer, true);
+        }
+    }
+
+    if (g_hSuicidePenalty != INVALID_HANDLE)
+    {
+        if (GetConVarInt(g_hSuicidePenalty) !=      _SUICIDE_PENALTY_)
+        {
+            IntToString(_SUICIDE_PENALTY_,          szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hSuicidePenalty,      szBuffer, true);
+        }
+
+        if (!g_bSPenConVarChangeHooked)
+        {
+            HookConVarChange(g_hSuicidePenalty,     _Con_Var_Change_);
+
+            g_bSPenConVarChangeHooked =             true;
+        }
+
+        if (GetConVarInt(g_hSuicidePenalty) !=      _SUICIDE_PENALTY_)
+        {
+            IntToString(_SUICIDE_PENALTY_,          szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hSuicidePenalty,      szBuffer, true);
         }
     }
 
@@ -846,6 +878,16 @@ public void OnMapEnd()
         }
     }
 
+    if (g_hSuicidePenalty != INVALID_HANDLE)
+    {
+        if (g_bSPenConVarChangeHooked)
+        {
+            UnhookConVarChange(g_hSuicidePenalty,   _Con_Var_Change_);
+
+            g_bSPenConVarChangeHooked =             false;
+        }
+    }
+
     if (g_hPatchAddr != Address_Null)
     {
         if (g_nPatchSize != -1)
@@ -1064,6 +1106,16 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
         if (StringToInt(szNew) !=           _SUICIDE_SCORE_)
         {
             IntToString(_SUICIDE_SCORE_,    szBuffer, sizeof (szBuffer));
+
+            SetConVarString(hConVar,        szBuffer, true);
+        }
+    }
+
+    else if (hConVar == g_hSuicidePenalty)
+    {
+        if (StringToInt(szNew) !=           _SUICIDE_PENALTY_)
+        {
+            IntToString(_SUICIDE_PENALTY_,  szBuffer, sizeof (szBuffer));
 
             SetConVarString(hConVar,        szBuffer, true);
         }

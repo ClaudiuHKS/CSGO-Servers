@@ -14,6 +14,7 @@
  */
 
 #define _SUICIDE_SCORE_             (0) // contributionscore_suicide
+#define _SUICIDE_PENALTY_           (0) // mp_suicide_penalty
 
 
 /**
@@ -42,10 +43,12 @@ public Plugin myinfo =
  */
 
 Handle g_hSuicideScore =                INVALID_HANDLE;
+Handle g_hSuicidePenalty =              INVALID_HANDLE;
 
 bool g_bPlayerDeathHooked =             false;
 
 bool g_bSScoreConVarChangeHooked =      false;
+bool g_bSPenConVarChangeHooked =        false;
 
 
 /**
@@ -127,6 +130,11 @@ public void OnMapStart()
         g_hSuicideScore =                           FindConVar("contributionscore_suicide");
     }
 
+    if (g_hSuicidePenalty == INVALID_HANDLE)
+    {
+        g_hSuicidePenalty =                         FindConVar("mp_suicide_penalty");
+    }
+
     if (g_hSuicideScore != INVALID_HANDLE)
     {
         if (GetConVarInt(g_hSuicideScore) !=        _SUICIDE_SCORE_)
@@ -150,6 +158,30 @@ public void OnMapStart()
             SetConVarString(g_hSuicideScore,        szBuffer, true);
         }
     }
+
+    if (g_hSuicidePenalty != INVALID_HANDLE)
+    {
+        if (GetConVarInt(g_hSuicidePenalty) !=      _SUICIDE_PENALTY_)
+        {
+            IntToString(_SUICIDE_PENALTY_,          szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hSuicidePenalty,      szBuffer, true);
+        }
+
+        if (!g_bSPenConVarChangeHooked)
+        {
+            HookConVarChange(g_hSuicidePenalty,     _Con_Var_Change_);
+
+            g_bSPenConVarChangeHooked =             true;
+        }
+
+        if (GetConVarInt(g_hSuicidePenalty) !=      _SUICIDE_PENALTY_)
+        {
+            IntToString(_SUICIDE_PENALTY_,          szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hSuicidePenalty,      szBuffer, true);
+        }
+    }
 }
 
 public void OnMapEnd()
@@ -168,6 +200,16 @@ public void OnMapEnd()
             UnhookConVarChange(g_hSuicideScore,     _Con_Var_Change_);
 
             g_bSScoreConVarChangeHooked =           false;
+        }
+    }
+
+    if (g_hSuicidePenalty != INVALID_HANDLE)
+    {
+        if (g_bSPenConVarChangeHooked)
+        {
+            UnhookConVarChange(g_hSuicidePenalty,   _Con_Var_Change_);
+
+            g_bSPenConVarChangeHooked =             false;
         }
     }
 }
@@ -263,6 +305,16 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
         if (StringToInt(szNew) !=           _SUICIDE_SCORE_)
         {
             IntToString(_SUICIDE_SCORE_,    szBuffer, sizeof (szBuffer));
+
+            SetConVarString(hConVar,        szBuffer, true);
+        }
+    }
+
+    else if (hConVar == g_hSuicidePenalty)
+    {
+        if (StringToInt(szNew) !=           _SUICIDE_PENALTY_)
+        {
+            IntToString(_SUICIDE_PENALTY_,  szBuffer, sizeof (szBuffer));
 
             SetConVarString(hConVar,        szBuffer, true);
         }
