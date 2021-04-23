@@ -1,0 +1,195 @@
+"SvTickRate"
+{
+
+    //
+    // Examples
+    //
+    //
+    //  "YourServerIP:YourServerPORT"       // This Will Be 128 Tick Rate 24 / 7
+    //  {
+    //      "tick_rate"                     "128"
+    //      "default_tick_rate"             "128"
+    //      "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+    //  }
+    //
+    //
+    //  "YourServerIP:YourServerPORT"       // This Will Be 64 Tick Rate 24 / 7
+    //  {
+    //      "tick_rate"                     "64"
+    //      "default_tick_rate"             "64"
+    //      "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+    //  }
+    //
+    //
+    //  "YourServerIP:YourServerPORT"       // This Will Be 64 Tick Rate Day And 128 Tick Rate Night
+    //  {
+    //      "tick_rate"                     "128"
+    //      "default_tick_rate"             "64"
+    //      "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,24"
+    //  }
+    //
+    //
+    //  "YourServerIP:YourServerPORT"       // This Will Be 128 Tick Rate Day And 64 Tick Rate Night
+    //  {
+    //      "tick_rate"                     "64"
+    //      "default_tick_rate"             "128"
+    //      "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,24"
+    //  }
+    //
+    //
+    //  Valid Tick Rates
+    //
+    //
+    //  0.0078125   interval_per_tick   = 128   Tick Rate
+    //  0.008       interval_per_tick   = 125   Tick Rate
+    //  0.01        interval_per_tick   = 100   Tick Rate
+    //  0.0125      interval_per_tick   = 80    Tick Rate
+    //  0.015625    interval_per_tick   = 64    Tick Rate
+    //  0.02        interval_per_tick   = 50    Tick Rate
+    //  0.025       interval_per_tick   = 40    Tick Rate
+    //  0.03125     interval_per_tick   = 32    Tick Rate
+    //  0.04        interval_per_tick   = 25    Tick Rate
+    //
+    //
+    // Add  PublicIP:PORT + LocalIP:PORT + DNS:PORT  To Make Sure It Works Properly
+    //
+
+    //
+    // 27015
+    //
+
+        "localhost:27015"
+        {
+            "tick_rate"                     "128"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "127.0.0.1:27015"
+        {
+            "tick_rate"                     "128"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "hattrick.go.ro:27015"
+        {
+            "tick_rate"                     "128"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "192.168.100.2:27015"
+        {
+            "tick_rate"                     "128"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "192.168.100.1:27015"
+        {
+            "tick_rate"                     "128"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "86.124.105.50:27015"
+        {
+            "tick_rate"                     "128"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+    //
+    // 27016
+    //
+
+        "localhost:27016"
+        {
+            "tick_rate"                     "64"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "127.0.0.1:27016"
+        {
+            "tick_rate"                     "64"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "hattrick.go.ro:27016"
+        {
+            "tick_rate"                     "64"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "192.168.100.2:27016"
+        {
+            "tick_rate"                     "64"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "192.168.100.1:27016"
+        {
+            "tick_rate"                     "64"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "86.124.105.50:27016"
+        {
+            "tick_rate"                     "64"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+    //
+    // 27017
+    //
+
+        "localhost:27017"
+        {
+            "tick_rate"                     "50"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "127.0.0.1:27017"
+        {
+            "tick_rate"                     "50"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "hattrick.go.ro:27017"
+        {
+            "tick_rate"                     "50"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "192.168.100.2:27017"
+        {
+            "tick_rate"                     "50"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "192.168.100.1:27017"
+        {
+            "tick_rate"                     "50"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+        "86.124.105.50:27017"
+        {
+            "tick_rate"                     "50"
+            "default_tick_rate"             "128"
+            "hours_for_not_default"         "00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
+        }
+
+}
