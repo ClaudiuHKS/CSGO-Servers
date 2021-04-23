@@ -47,6 +47,11 @@
         "sv_setsteamaccount"    "12ED369A..."
     }
 
+    "192.168.56.1:27015"
+    {
+        "sv_setsteamaccount"    "12ED369A..."
+    }
+
     //
     // 27016
     //
@@ -81,6 +86,11 @@
         "sv_setsteamaccount"    "36FF9024..."
     }
 
+    "192.168.56.1:27016"
+    {
+        "sv_setsteamaccount"    "36FF9024..."
+    }
+
     //
     // 27017
     //
@@ -111,6 +121,11 @@
     }
 
     "86.124.105.50:27017"
+    {
+        "sv_setsteamaccount"    "841D4DC4..."
+    }
+
+    "192.168.56.1:27017"
     {
         "sv_setsteamaccount"    "841D4DC4..."
     }
