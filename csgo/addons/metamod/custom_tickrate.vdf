@@ -1,0 +1,6 @@
+"Metamod Plugin"
+{
+    "alias"     "custom_tickrate"
+
+    "file"      "addons/custom_tickrate/bin/custom_tickrate_mm"
+}
