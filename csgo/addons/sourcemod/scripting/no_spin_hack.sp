@@ -13,7 +13,7 @@
  * CUSTOM DEFINITIONS
  */
 
-#define _MINUTES_   1051000                 // MINUTES TO BAN   [ 0 = PERMANENT | 1051000 = 2 YEARS | .. ]
+#define _MINUTES_   1051000                 // MINUTES TO BAN   [ 0 = PERMANENT, 1051000 = 2 YEARS, .. ]
 #define _REASON_    "INHUMAN REACTIONS"     // REASON OF BAN    [ CAN HAVE WHITE SPACES INSIDE ]
 
 
@@ -25,7 +25,7 @@ public Plugin myinfo =
 {
     name =          "No Spin Hack",
     author =        "CARAMEL® HACK",
-    description =   "Blocks any spin hacks.",
+    description =   "Blocks Any Spin Hacks",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };
@@ -45,9 +45,7 @@ static float g_fAng[MAXPLAYERS][3];
 
 public void OnPluginStart()
 {
-    static int nIter = 0;
-
-    for (nIter = 1; nIter < MAXPLAYERS; nIter++)
+    for (int nIter = 1; nIter < MAXPLAYERS; nIter++)
     {
         if (IsClientConnected(nIter) && IsClientInGame(nIter))
         {
@@ -58,9 +56,7 @@ public void OnPluginStart()
 
 public void OnPluginEnd()
 {
-    static int nIter = 0;
-
-    for (nIter = 1; nIter < MAXPLAYERS; nIter++)
+    for (int nIter = 1; nIter < MAXPLAYERS; nIter++)
     {
         if (IsClientConnected(nIter) && IsClientInGame(nIter))
         {
@@ -71,17 +67,17 @@ public void OnPluginEnd()
 
 public void OnClientPutInServer(int nEntity)
 {
-    SDKHookEx(nEntity, SDKHook_OnTakeDamageAlive,   _Take_Damage_Alive_);
+    SDKHookEx(nEntity, SDKHook_OnTakeDamageAlive, _Take_Damage_Alive_);
 }
 
 public void OnClientDisconnect(int nEntity)
 {
-    SDKUnhook(nEntity, SDKHook_OnTakeDamageAlive,   _Take_Damage_Alive_);
+    SDKUnhook(nEntity, SDKHook_OnTakeDamageAlive, _Take_Damage_Alive_);
 }
 
 public void OnClientDisconnect_Post(int nEntity)
 {
-    SDKUnhook(nEntity, SDKHook_OnTakeDamageAlive,   _Take_Damage_Alive_);
+    SDKUnhook(nEntity, SDKHook_OnTakeDamageAlive, _Take_Damage_Alive_);
 }
 
 public Action OnPlayerRunCmd(int nEntity, int& nButtons, int& nImpulse, float fVelocity[3], float fAngles[3], int& nWeapon, int& nSubType, int& nCmdNum, int& nTickCount, int& nSeed, int nMouseDir[2])
@@ -110,7 +106,7 @@ public Action _Take_Damage_Alive_(int nVictim, int& nAttacker, int& nInflictor, 
             {
                 if (FloatAbs(g_fLen[nAttacker][0]) >= 45.0 || FloatAbs(g_fLen[nAttacker][1]) >= 45.0 || FloatAbs(g_fLen[nAttacker][2]) >= 45.0)
                 {
-                    ServerCommand("sm_ban #%d %d \"%s\";", GetClientUserId(nAttacker), _MINUTES_, _REASON_);
+                    ServerCommand("sm_ban #%d %d \"%s\"", GetClientUserId(nAttacker), _MINUTES_, _REASON_);
                 }
             }
         }

@@ -24,7 +24,7 @@ public Plugin myinfo =
 {
     name =          "Reset Score Command",
     author =        "CARAMEL® HACK",
-    description =   "Provides commands to reset the score.",
+    description =   "Provides Commands To Reset The Score",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };

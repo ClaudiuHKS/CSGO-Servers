@@ -17,7 +17,7 @@ public Plugin myinfo =
 {
     name =          "Fast Duck",
     author =        "CARAMEL® HACK",
-    description =   "Provides fast players ducking.",
+    description =   "Provides Unlimited Players Ducking",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };

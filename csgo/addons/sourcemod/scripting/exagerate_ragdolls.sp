@@ -24,7 +24,7 @@ public Plugin myinfo =
 {
     name =          "Exagerate Ragdolls",
     author =        "CARAMEL® HACK",
-    description =   "Exagerates ragdolls.",
+    description =   "Exagerates Ragdolls",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };

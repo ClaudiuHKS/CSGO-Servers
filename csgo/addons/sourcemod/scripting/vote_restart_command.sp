@@ -17,7 +17,7 @@ public Plugin myinfo =
 {
     name =          "Vote Restart Command",
     author =        "CARAMEL® HACK",
-    description =   "Provides custom command to vote to restart the game in progress.",
+    description =   "Provides Custom Command To Vote To Restart The Game In Progress",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };

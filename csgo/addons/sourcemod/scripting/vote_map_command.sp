@@ -17,7 +17,7 @@ public Plugin myinfo =
 {
     name =          "Vote Map Command",
     author =        "CARAMEL® HACK",
-    description =   "Provides custom command to vote to change the map.",
+    description =   "Provides Custom Command To Vote To Change The Map",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };

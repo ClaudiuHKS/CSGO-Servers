@@ -13,7 +13,7 @@
  * CUSTOM DEFINITIONS TO BE EDITED
  */
 
-#define _BOT_QUOTA_                 (2)
+#define _BOT_QUOTA_                 (2) // bot_quota
 
 
 /**
@@ -24,7 +24,7 @@ public Plugin myinfo =
 {
     name =          "'bot_quota' Force Value",
     author =        "CARAMEL® HACK",
-    description =   "Forces a 'bot_quota' value.",
+    description =   "Forces A 'bot_quota' Value",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };
@@ -50,6 +50,8 @@ public void OnPluginStart()
 
 public void OnMapStart()
 {
+    static char szBuffer[PLATFORM_MAX_PATH] =       { 0, ... };
+
     if (g_hBotQuota == INVALID_HANDLE)
     {
         g_hBotQuota =                               FindConVar("bot_quota");
@@ -59,7 +61,9 @@ public void OnMapStart()
     {
         if (GetConVarInt(g_hBotQuota) !=            _BOT_QUOTA_)
         {
-            SetConVarInt(g_hBotQuota,               _BOT_QUOTA_);
+            IntToString(_BOT_QUOTA_,                szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hBotQuota,            szBuffer, true);
         }
 
         if (!g_bQuotaConVarChangeHooked)
@@ -71,7 +75,9 @@ public void OnMapStart()
 
         if (GetConVarInt(g_hBotQuota) !=            _BOT_QUOTA_)
         {
-            SetConVarInt(g_hBotQuota,               _BOT_QUOTA_);
+            IntToString(_BOT_QUOTA_,                szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hBotQuota,            szBuffer, true);
         }
     }
 }
@@ -101,11 +107,15 @@ public void OnPluginEnd()
 
 public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] szNew)
 {
+    static char szBuffer[PLATFORM_MAX_PATH] = { 0, ... };
+
     if (hConVar == g_hBotQuota)
     {
         if (StringToInt(szNew) !=           _BOT_QUOTA_)
         {
-            SetConVarInt(hConVar,           _BOT_QUOTA_);
+            IntToString(_BOT_QUOTA_,        szBuffer, sizeof (szBuffer));
+
+            SetConVarString(hConVar,        szBuffer, true);
         }
     }
 }

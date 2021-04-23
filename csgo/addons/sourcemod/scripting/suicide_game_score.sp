@@ -10,6 +10,13 @@
 
 
 /**
+ * CUSTOM DEFINITIONS TO BE EDITED
+ */
+
+#define _SUICIDE_SCORE_             (0) // contributionscore_suicide
+
+
+/**
  * CUSTOM DEFINITIONS
  */
 
@@ -24,7 +31,7 @@ public Plugin myinfo =
 {
     name =          "Suicide Game Score",
     author =        "CARAMEL® HACK",
-    description =   "Alters the score of the players committing suicide.",
+    description =   "Alters The Score Of The Players Committing Suicide",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };
@@ -34,7 +41,11 @@ public Plugin myinfo =
  * GLOBAL VARIABLES
  */
 
-bool g_bPlayerDeathHooked =         false;
+Handle g_hSuicideScore =                INVALID_HANDLE;
+
+bool g_bPlayerDeathHooked =             false;
+
+bool g_bSScoreConVarChangeHooked =      false;
 
 
 /**
@@ -102,11 +113,42 @@ public void OnPluginStart()
 
 public void OnMapStart()
 {
+    static char szBuffer[PLATFORM_MAX_PATH] =       { 0, ... };
+
     if (!g_bPlayerDeathHooked)
     {
         HookEventEx("player_death",                 _Player_Death_);
 
         g_bPlayerDeathHooked =                      true;
+    }
+
+    if (g_hSuicideScore == INVALID_HANDLE)
+    {
+        g_hSuicideScore =                           FindConVar("contributionscore_suicide");
+    }
+
+    if (g_hSuicideScore != INVALID_HANDLE)
+    {
+        if (GetConVarInt(g_hSuicideScore) !=        _SUICIDE_SCORE_)
+        {
+            IntToString(_SUICIDE_SCORE_,            szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hSuicideScore,        szBuffer, true);
+        }
+
+        if (!g_bSScoreConVarChangeHooked)
+        {
+            HookConVarChange(g_hSuicideScore,       _Con_Var_Change_);
+
+            g_bSScoreConVarChangeHooked =           true;
+        }
+
+        if (GetConVarInt(g_hSuicideScore) !=        _SUICIDE_SCORE_)
+        {
+            IntToString(_SUICIDE_SCORE_,            szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hSuicideScore,        szBuffer, true);
+        }
     }
 }
 
@@ -117,6 +159,16 @@ public void OnMapEnd()
         UnhookEvent("player_death",                 _Player_Death_);
 
         g_bPlayerDeathHooked =                      false;
+    }
+
+    if (g_hSuicideScore != INVALID_HANDLE)
+    {
+        if (g_bSScoreConVarChangeHooked)
+        {
+            UnhookConVarChange(g_hSuicideScore,     _Con_Var_Change_);
+
+            g_bSScoreConVarChangeHooked =           false;
+        }
     }
 }
 
@@ -198,6 +250,21 @@ public Action _Timer_Decrease_Deaths_(Handle hTimer, any nId)
         if (nDeaths > 0)
         {
             SetEntData(nEntity, m_iDeaths,          nDeaths - 1);
+        }
+    }
+}
+
+public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] szNew)
+{
+    static char szBuffer[PLATFORM_MAX_PATH] = { 0, ... };
+
+    if (hConVar == g_hSuicideScore)
+    {
+        if (StringToInt(szNew) !=           _SUICIDE_SCORE_)
+        {
+            IntToString(_SUICIDE_SCORE_,    szBuffer, sizeof (szBuffer));
+
+            SetConVarString(hConVar,        szBuffer, true);
         }
     }
 }

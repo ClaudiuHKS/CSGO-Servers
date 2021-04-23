@@ -25,7 +25,7 @@ public Plugin myinfo =
 {
     name =          "SM CVar Command",
     author =        "CARAMEL® HACK",
-    description =   "Provides the 'sm_cvar' command.",
+    description =   "Provides The 'sm_cvar' Command",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };

@@ -17,7 +17,7 @@ public Plugin myinfo =
 {
     name =          "Movement Unlocker",
     author =        "CARAMEL® HACK",
-    description =   "Unlocks the game players movement.",
+    description =   "Unlocks The Game Players Movement",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };

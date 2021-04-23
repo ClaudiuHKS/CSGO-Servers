@@ -13,7 +13,7 @@
  * CUSTOM DEFINITIONS TO BE EDITED
  */
 
-#define _SV_FULL_ALLTALK_           (1)
+#define _SV_FULL_ALLTALK_           (1) // sv_full_alltalk
 
 
 /**
@@ -24,7 +24,7 @@ public Plugin myinfo =
 {
     name =          "'sv_full_alltalk' Force Value",
     author =        "CARAMEL® HACK",
-    description =   "Forces a 'sv_full_alltalk' value.",
+    description =   "Forces A 'sv_full_alltalk' Value",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };
@@ -50,6 +50,8 @@ public void OnPluginStart()
 
 public void OnMapStart()
 {
+    static char szBuffer[PLATFORM_MAX_PATH] =       { 0, ... };
+
     if (g_hSvFullAllTalk == INVALID_HANDLE)
     {
         g_hSvFullAllTalk =                          FindConVar("sv_full_alltalk");
@@ -59,7 +61,9 @@ public void OnMapStart()
     {
         if (GetConVarInt(g_hSvFullAllTalk) !=       _SV_FULL_ALLTALK_)
         {
-            SetConVarInt(g_hSvFullAllTalk,          _SV_FULL_ALLTALK_);
+            IntToString(_SV_FULL_ALLTALK_,          szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hSvFullAllTalk,       szBuffer, true);
         }
 
         if (!g_bAllTalkConVarChangeHooked)
@@ -71,7 +75,9 @@ public void OnMapStart()
 
         if (GetConVarInt(g_hSvFullAllTalk) !=       _SV_FULL_ALLTALK_)
         {
-            SetConVarInt(g_hSvFullAllTalk,          _SV_FULL_ALLTALK_);
+            IntToString(_SV_FULL_ALLTALK_,          szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hSvFullAllTalk,       szBuffer, true);
         }
     }
 }
@@ -101,11 +107,15 @@ public void OnPluginEnd()
 
 public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] szNew)
 {
+    static char szBuffer[PLATFORM_MAX_PATH] = { 0, ... };
+
     if (hConVar == g_hSvFullAllTalk)
     {
         if (StringToInt(szNew) !=           _SV_FULL_ALLTALK_)
         {
-            SetConVarInt(hConVar,           _SV_FULL_ALLTALK_);
+            IntToString(_SV_FULL_ALLTALK_,  szBuffer, sizeof (szBuffer));
+
+            SetConVarString(hConVar,        szBuffer, true);
         }
     }
 }

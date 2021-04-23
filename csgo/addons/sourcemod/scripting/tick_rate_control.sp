@@ -13,8 +13,8 @@
  * CUSTOM DEFINITIONS TO BE EDITED
  */
 
-#define _STEAM_SV_KEYS_KV_FILE_     "SteamSvKeys.TXT"
-#define _STEAM_SV_KEYS_KV_TITLE_    "SteamSvKeys"
+#define _SV_TICK_RATE_KV_FILE_      "SvTickRate.TXT"
+#define _SV_TICK_RATE_KV_TITLE_     "SvTickRate"
 
 
 /**
@@ -23,9 +23,9 @@
 
 public Plugin myinfo =
 {
-    name =          "Set Steam Account From File",
+    name =          "Tick Rate Control",
     author =        "CARAMEL® HACK",
-    description =   "Executes 'sv_setsteamaccount' By Reading A TXT File",
+    description =   "Provides Custom Tick Rate Values",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };
@@ -236,6 +236,11 @@ bool _Get_From_Kv_File_(const char[] szFileTitle, const char[] szFileName, const
     return false;
 }
 
+static int _Get_Sv_Tick_Rate_()
+{
+    return RoundToNearest(1.0 / GetTickInterval());
+}
+
 
 /**
  * CUSTOM PUBLIC FORWARDS
@@ -244,12 +249,20 @@ bool _Get_From_Kv_File_(const char[] szFileTitle, const char[] szFileName, const
 public void OnPluginStart()
 {
     OnMapStart();
+
+    OnConfigsExecuted();
 }
 
 public void OnMapStart()
 {
-    static char szFullIpAddr[PLATFORM_MAX_PATH] = { 0, ... }, szDataPath[PLATFORM_MAX_PATH] = { 0, ... }, szSteamKeysKvFile[PLATFORM_MAX_PATH] = { 0, ... },
-        szSteamKey[PLATFORM_MAX_PATH] = { 0, ... };
+    static char szFullIpAddr[PLATFORM_MAX_PATH] = { 0, ... }, szDataPath[PLATFORM_MAX_PATH] = { 0, ... }, szDefaultTickRate[PLATFORM_MAX_PATH] = { 0, ... },
+        szTickRateKvFile[PLATFORM_MAX_PATH] = { 0, ... }, szTickRate[PLATFORM_MAX_PATH] = { 0, ... }, szHours[PLATFORM_MAX_PATH] = { 0, ... },
+        szCurrentHour[PLATFORM_MAX_PATH] = { 0, ... };
+
+    static Handle hData = INVALID_HANDLE;
+    static int nTickInterval = 0, nHostStateInterval = 0, nTickRate = 0, nDefaultTickRate = 0;
+    static Address hStartSound = Address_Null, hSpawnServer = Address_Null, hTickInterval = Address_Null, hIntervalPerTick = Address_Null;
+    static float fIntervalPerTick = 0.0, fDefaultIntervalPerTick = 0.0;
 
     BuildPath(Path_SM, szDataPath, sizeof (szDataPath), "data");
 
@@ -258,24 +271,91 @@ public void OnMapStart()
         _Create_Dir_(szDataPath);
     }
 
-    if (DirExists(szDataPath))
+    if ((hData = LoadGameConfigFile("tick_rate_control.games")) != INVALID_HANDLE)
     {
-        FormatEx(szSteamKeysKvFile, sizeof (szSteamKeysKvFile), "%s/%s", szDataPath, _STEAM_SV_KEYS_KV_FILE_);
-
-        if (FileExists(szSteamKeysKvFile))
+        if
+        (
+            (
+                (hStartSound = GameConfGetAddress(hData,        "sv_startsound"))
+                    !=
+                (Address_Null)
+            )
+            &&
+            (
+                (hSpawnServer = GameConfGetAddress(hData,       "spawnserver"))
+                    !=
+                (Address_Null)
+            )
+            &&
+            (
+                (nTickInterval = GameConfGetOffset(hData,       "m_flTickInterval"))
+                    !=
+                (-1)
+            )
+            &&
+            (
+                (nHostStateInterval = GameConfGetOffset(hData,  "host_state_interval"))
+                    !=
+                (-1)
+            )
+        )
         {
-            _Get_Sv_Full_Ip_(szFullIpAddr, sizeof (szFullIpAddr));
+            hTickInterval       = view_as<Address>(LoadFromAddress(hStartSound  + view_as<Address>(nTickInterval),      NumberType_Int32));
+            hIntervalPerTick    = view_as<Address>(LoadFromAddress(hSpawnServer + view_as<Address>(nHostStateInterval), NumberType_Int32));
 
-            if (_Get_From_Kv_File_(_STEAM_SV_KEYS_KV_TITLE_, szSteamKeysKvFile, szFullIpAddr, "sv_setsteamaccount", szSteamKey, sizeof (szSteamKey)))
+            if (hTickInterval   != Address_Null && hIntervalPerTick != Address_Null)
             {
-                if (strlen(szSteamKey) > 0)
+                if (DirExists(szDataPath))
                 {
-                    if (IsCharNumeric(szSteamKey[0]) || (IsCharAlpha(szSteamKey[0]) && IsCharUpper(szSteamKey[0])))
+                    FormatEx(szTickRateKvFile, sizeof (szTickRateKvFile), "%s/%s", szDataPath, _SV_TICK_RATE_KV_FILE_);
+
+                    if (FileExists(szTickRateKvFile))
                     {
-                        ServerCommand("sv_setsteamaccount %s", szSteamKey);
+                        _Get_Sv_Full_Ip_(szFullIpAddr, sizeof (szFullIpAddr));
+
+                        if (_Get_From_Kv_File_(_SV_TICK_RATE_KV_TITLE_, szTickRateKvFile, szFullIpAddr,         "tick_rate",                szTickRate,         sizeof (szTickRate)))
+                        {
+                            if (_Get_From_Kv_File_(_SV_TICK_RATE_KV_TITLE_, szTickRateKvFile, szFullIpAddr,     "default_tick_rate",        szDefaultTickRate,  sizeof (szDefaultTickRate)))
+                            {
+                                if (_Get_From_Kv_File_(_SV_TICK_RATE_KV_TITLE_, szTickRateKvFile, szFullIpAddr, "hours_for_not_default",    szHours,            sizeof (szHours)))
+                                {
+                                    if (strlen(szTickRate) > 0 && strlen(szDefaultTickRate) > 0 && strlen(szHours) > 0)
+                                    {
+                                        FormatTime(szCurrentHour, sizeof (szCurrentHour), "%H");
+
+                                        nTickRate =                             StringToInt(szTickRate);
+                                        nDefaultTickRate =                      StringToInt(szDefaultTickRate);
+
+                                        fIntervalPerTick =                      1.0 / float(nTickRate);
+                                        fDefaultIntervalPerTick =               1.0 / float(nDefaultTickRate);
+
+                                        if (StrContains(szHours, szCurrentHour) != -1)
+                                        {
+                                            StoreToAddress(hTickInterval,       view_as<int>(fIntervalPerTick), NumberType_Int32);
+                                            StoreToAddress(hIntervalPerTick,    view_as<int>(fIntervalPerTick), NumberType_Int32);
+                                        }
+
+                                        else
+                                        {
+                                            StoreToAddress(hTickInterval,       view_as<int>(fDefaultIntervalPerTick), NumberType_Int32);
+                                            StoreToAddress(hIntervalPerTick,    view_as<int>(fDefaultIntervalPerTick), NumberType_Int32);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+
+        CloseHandle(hData);
+
+        hData = INVALID_HANDLE;
     }
+}
+
+public void OnConfigsExecuted()
+{
+    ServerCommand("exec %d_tickrate.cfg", _Get_Sv_Tick_Rate_());
 }

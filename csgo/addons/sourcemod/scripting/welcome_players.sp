@@ -25,7 +25,7 @@ public Plugin myinfo =
 {
     name =          "Welcome Players",
     author =        "CARAMEL® HACK",
-    description =   "Welcome all players after joining the game server.",
+    description =   "Welcomes All Players After Joining The Game Server",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };

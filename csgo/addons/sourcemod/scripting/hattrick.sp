@@ -16,14 +16,21 @@
 #define _WELCOME_MSG_1_             " \x01\x0BWelcome\x01. Committing\x09 suicide\x01 will not alter your\x04 score\x01. Unlimited\x09 team changes\x01 are\x04 allowed\x01. The\x09 voting system\x01 is\x04 enabled\x01."
 #define _WELCOME_MSG_2_             " \x01You may\x05 /rs\x01,\x05 /map\x01,\x05 /votemap\x01,\x05 /voterr\x01 or\x05 /voterestart\x01."
 
-#define _BOT_QUOTA_                 (2)
-#define _SV_FULL_ALLTALK_           (1)
+#define _BOT_QUOTA_                 (2) // bot_quota
+#define _SV_FULL_ALLTALK_           (1) // sv_full_alltalk
+#define _SUICIDE_SCORE_             (0) // contributionscore_suicide
 
 #define _STEAM_SV_KEYS_KV_FILE_     "SteamSvKeys.TXT"
 #define _STEAM_SV_KEYS_KV_TITLE_    "SteamSvKeys"
 
+#define _SV_TICK_RATE_KV_FILE_      "SvTickRate.TXT"
+#define _SV_TICK_RATE_KV_TITLE_     "SvTickRate"
+
 #define _DESC_SM_CVAR_              "sm_cvar REQ:CVar OPT:Value - Reveals Or Changes A CVar Value"
 #define _DESC_SM_CVAR_COL_          " \x01sm_cvar\x07 REQ:CVar\x0B OPT:Value\x09 -\x05 Reveals Or Changes A CVar Value"
+
+#define _DESC_SM_EXEC_TICK_CFG_     "sm_exec_tick_cfg - Executes The Tick Based Config File"
+#define _DESC_SM_EXEC_TICK_CFG_COL_ " \x01sm_exec_tick_cfg\x09 -\x05 Executes The Tick Based Config File"
 
 
 /**
@@ -41,7 +48,7 @@ public Plugin myinfo =
 {
     name =          "Hattrick",
     author =        "CARAMEL® HACK",
-    description =   "Provides custom stuff.",
+    description =   "Provides Custom Stuff",
     version =       __DATE__,
     url =           "https://hattrick.go.ro/",
 };
@@ -51,24 +58,30 @@ public Plugin myinfo =
  * GLOBAL VARIABLES
  */
 
-bool g_bMsgShown[MAXPLAYERS] =      { false, ... };
+bool g_bMsgShown[MAXPLAYERS] =          { false, ... };
 
-Handle g_hBotQuota =                INVALID_HANDLE;
-Handle g_hSvFullAllTalk =           INVALID_HANDLE;
+Handle g_hBotQuota =                    INVALID_HANDLE;
+Handle g_hSvFullAllTalk =               INVALID_HANDLE;
+Handle g_hHostName =                    INVALID_HANDLE;
+Handle g_hSvTags =                      INVALID_HANDLE;
+Handle g_hSuicideScore =                INVALID_HANDLE;
 
-int g_nPatchSize =                  -1;
-int g_nPatchOffs =                  -1;
-int g_nPatchOrigBytes[512] =        { 0, ... };
+int g_nPatchSize =                      -1;
+int g_nPatchOffs =                      -1;
+int g_nPatchOrigBytes[512] =            { 0, ... };
 
-Address g_hPatchAddr =              Address_Null;
+Address g_hPatchAddr =                  Address_Null;
 
-bool g_bPatchStatus =               false;
+bool g_bPatchStatus =                   false;
 
-bool g_bPlayerDeathHooked =         false;
-bool g_bPlayerTeamHooked =          false;
+bool g_bPlayerDeathHooked =             false;
+bool g_bPlayerTeamHooked =              false;
 
-bool g_bQuotaConVarChangeHooked =   false;
-bool g_bAllTalkConVarChangeHooked = false;
+bool g_bQuotaConVarChangeHooked =       false;
+bool g_bAllTalkConVarChangeHooked =     false;
+bool g_bHostNameConVarChangeHooked =    false;
+bool g_bSvTagsConVarChangeHooked =      false;
+bool g_bSScoreConVarChangeHooked =      false;
 
 
 /**
@@ -330,6 +343,11 @@ static int _CVar_Flags_Str_(ConVar& hConVar, char[] szStr, int nMaxLen)
     }
 }
 
+static int _Get_Sv_Tick_Rate_()
+{
+    return RoundToNearest(1.0 / GetTickInterval());
+}
+
 static int _Get_Offs_(int nEntity, const char[] szProp)
 {
     static const char szTables[][] =
@@ -386,18 +404,25 @@ static int _Get_Offs_(int nEntity, const char[] szProp)
 
 public void OnPluginStart()
 {
-    RegAdminCmd("sm_cvar", _SM_CVar_, ADMFLAG_CONVARS, _DESC_SM_CVAR_);
+    RegAdminCmd("sm_cvar",              _SM_CVar_,              ADMFLAG_CONVARS,    _DESC_SM_CVAR_);
+    RegAdminCmd("sm_exec_tick_cfg",     _SM_Exec_Tick_Cfg_,     ADMFLAG_CONFIG,     _DESC_SM_EXEC_TICK_CFG_);
 
     OnMapStart();
+
+    OnConfigsExecuted();
 }
 
 public void OnMapStart()
 {
     static char szFullIpAddr[PLATFORM_MAX_PATH] = { 0, ... }, szDataPath[PLATFORM_MAX_PATH] = { 0, ... }, szSteamKeysKvFile[PLATFORM_MAX_PATH] = { 0, ... },
-        szSteamKey[PLATFORM_MAX_PATH] = { 0, ... };
+        szSteamKey[PLATFORM_MAX_PATH] = { 0, ... }, szTickRateKvFile[PLATFORM_MAX_PATH] = { 0, ... }, szTickRate[PLATFORM_MAX_PATH] = { 0, ... },
+        szDefaultTickRate[PLATFORM_MAX_PATH] = { 0, ... }, szHours[PLATFORM_MAX_PATH] = { 0, ... }, szCurrentHour[PLATFORM_MAX_PATH] = { 0, ... },
+        szBuffer[PLATFORM_MAX_PATH] = { 0, ... };
 
     static Handle hData = INVALID_HANDLE;
-    static int nIter = 0;
+    static int nIter = 0, nTickInterval = 0, nHostStateInterval = 0, nTickRate = 0, nDefaultTickRate = 0;
+    static Address hStartSound = Address_Null, hSpawnServer = Address_Null, hTickInterval = Address_Null, hIntervalPerTick = Address_Null;
+    static float fIntervalPerTick = 0.0, fDefaultIntervalPerTick = 0.0;
 
     BuildPath(Path_SM, szDataPath, sizeof (szDataPath), "data");
 
@@ -451,11 +476,28 @@ public void OnMapStart()
         g_hSvFullAllTalk =                          FindConVar("sv_full_alltalk");
     }
 
+    if (g_hHostName == INVALID_HANDLE)
+    {
+        g_hHostName =                               FindConVar("hostname");
+    }
+
+    if (g_hSvTags == INVALID_HANDLE)
+    {
+        g_hSvTags =                                 FindConVar("sv_tags");
+    }
+
+    if (g_hSuicideScore == INVALID_HANDLE)
+    {
+        g_hSuicideScore =                           FindConVar("contributionscore_suicide");
+    }
+
     if (g_hBotQuota != INVALID_HANDLE)
     {
         if (GetConVarInt(g_hBotQuota) !=            _BOT_QUOTA_)
         {
-            SetConVarInt(g_hBotQuota,               _BOT_QUOTA_);
+            IntToString(_BOT_QUOTA_,                szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hBotQuota,            szBuffer, true);
         }
 
         if (!g_bQuotaConVarChangeHooked)
@@ -467,7 +509,9 @@ public void OnMapStart()
 
         if (GetConVarInt(g_hBotQuota) !=            _BOT_QUOTA_)
         {
-            SetConVarInt(g_hBotQuota,               _BOT_QUOTA_);
+            IntToString(_BOT_QUOTA_,                szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hBotQuota,            szBuffer, true);
         }
     }
 
@@ -475,7 +519,9 @@ public void OnMapStart()
     {
         if (GetConVarInt(g_hSvFullAllTalk) !=       _SV_FULL_ALLTALK_)
         {
-            SetConVarInt(g_hSvFullAllTalk,          _SV_FULL_ALLTALK_);
+            IntToString(_SV_FULL_ALLTALK_,          szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hSvFullAllTalk,       szBuffer, true);
         }
 
         if (!g_bAllTalkConVarChangeHooked)
@@ -487,55 +533,232 @@ public void OnMapStart()
 
         if (GetConVarInt(g_hSvFullAllTalk) !=       _SV_FULL_ALLTALK_)
         {
-            SetConVarInt(g_hSvFullAllTalk,          _SV_FULL_ALLTALK_);
+            IntToString(_SV_FULL_ALLTALK_,          szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hSvFullAllTalk,       szBuffer, true);
         }
     }
 
-    if
-    (
-        (
-            (hData = LoadGameConfigFile("hattrick.games"))
-                !=
-            (INVALID_HANDLE)
-        )
-        &&
-        (
-            (g_hPatchAddr = GameConfGetAddress(hData,       "WalkMoveMaxSpeed"))
-                !=
-            (Address_Null)
-        )
-        &&
-        (
-            (g_nPatchOffs = GameConfGetOffset(hData,        "CappingOffset"))
-                !=
-            (-1)
-        )
-        &&
-        (
-            (g_nPatchSize = GameConfGetOffset(hData,        "PatchBytes"))
-                !=
-            (-1)
-        )
-    )
+    if (g_hSuicideScore != INVALID_HANDLE)
     {
-        if (!g_bPatchStatus)
+        if (GetConVarInt(g_hSuicideScore) !=        _SUICIDE_SCORE_)
         {
-            for (nIter = 0; nIter < g_nPatchSize; nIter++)
-            {
-                g_nPatchOrigBytes[nIter] = LoadFromAddress(g_hPatchAddr + view_as<Address>(g_nPatchOffs) + view_as<Address>(nIter), NumberType_Int8);
+            IntToString(_SUICIDE_SCORE_,            szBuffer, sizeof (szBuffer));
 
-                StoreToAddress(g_hPatchAddr + view_as<Address>(g_nPatchOffs) + view_as<Address>(nIter), 0x90, NumberType_Int8);
-            }
+            SetConVarString(g_hSuicideScore,        szBuffer, true);
+        }
 
-            g_bPatchStatus = true;
+        if (!g_bSScoreConVarChangeHooked)
+        {
+            HookConVarChange(g_hSuicideScore,       _Con_Var_Change_);
+
+            g_bSScoreConVarChangeHooked =           true;
+        }
+
+        if (GetConVarInt(g_hSuicideScore) !=        _SUICIDE_SCORE_)
+        {
+            IntToString(_SUICIDE_SCORE_,            szBuffer, sizeof (szBuffer));
+
+            SetConVarString(g_hSuicideScore,        szBuffer, true);
         }
     }
 
-    if (hData != INVALID_HANDLE)
+    if (g_hHostName != INVALID_HANDLE)
     {
+        if (!g_bHostNameConVarChangeHooked)
+        {
+            HookConVarChange(g_hHostName,           _Con_Var_Change_);
+
+            g_bHostNameConVarChangeHooked =         true;
+        }
+    }
+
+    if (g_hSvTags != INVALID_HANDLE)
+    {
+        if (!g_bSvTagsConVarChangeHooked)
+        {
+            HookConVarChange(g_hSvTags,             _Con_Var_Change_);
+
+            g_bSvTagsConVarChangeHooked =           true;
+        }
+    }
+
+    if ((hData = LoadGameConfigFile("hattrick.games")) != INVALID_HANDLE)
+    {
+        if
+        (
+            (
+                (g_hPatchAddr = GameConfGetAddress(hData,       "WalkMoveMaxSpeed"))
+                    !=
+                (Address_Null)
+            )
+            &&
+            (
+                (g_nPatchOffs = GameConfGetOffset(hData,        "CappingOffset"))
+                    !=
+                (-1)
+            )
+            &&
+            (
+                (g_nPatchSize = GameConfGetOffset(hData,        "PatchBytes"))
+                    !=
+                (-1)
+            )
+        )
+        {
+            if (!g_bPatchStatus)
+            {
+                for (nIter = 0; nIter < g_nPatchSize; nIter++)
+                {
+                    g_nPatchOrigBytes[nIter] = LoadFromAddress(g_hPatchAddr + view_as<Address>(g_nPatchOffs) + view_as<Address>(nIter), NumberType_Int8);
+
+                    StoreToAddress(g_hPatchAddr + view_as<Address>(g_nPatchOffs) + view_as<Address>(nIter), 0x90, NumberType_Int8);
+                }
+
+                g_bPatchStatus = true;
+            }
+        }
+
+        if
+        (
+            (
+                (hStartSound = GameConfGetAddress(hData,        "sv_startsound"))
+                    !=
+                (Address_Null)
+            )
+            &&
+            (
+                (hSpawnServer = GameConfGetAddress(hData,       "spawnserver"))
+                    !=
+                (Address_Null)
+            )
+            &&
+            (
+                (nTickInterval = GameConfGetOffset(hData,       "m_flTickInterval"))
+                    !=
+                (-1)
+            )
+            &&
+            (
+                (nHostStateInterval = GameConfGetOffset(hData,  "host_state_interval"))
+                    !=
+                (-1)
+            )
+        )
+        {
+            hTickInterval       = view_as<Address>(LoadFromAddress(hStartSound  + view_as<Address>(nTickInterval),      NumberType_Int32));
+            hIntervalPerTick    = view_as<Address>(LoadFromAddress(hSpawnServer + view_as<Address>(nHostStateInterval), NumberType_Int32));
+
+            if (hTickInterval   != Address_Null && hIntervalPerTick != Address_Null)
+            {
+                if (DirExists(szDataPath))
+                {
+                    FormatEx(szTickRateKvFile, sizeof (szTickRateKvFile), "%s/%s", szDataPath, _SV_TICK_RATE_KV_FILE_);
+
+                    if (FileExists(szTickRateKvFile))
+                    {
+                        _Get_Sv_Full_Ip_(szFullIpAddr, sizeof (szFullIpAddr));
+
+                        if (_Get_From_Kv_File_(_SV_TICK_RATE_KV_TITLE_, szTickRateKvFile, szFullIpAddr,         "tick_rate",                szTickRate,         sizeof (szTickRate)))
+                        {
+                            if (_Get_From_Kv_File_(_SV_TICK_RATE_KV_TITLE_, szTickRateKvFile, szFullIpAddr,     "default_tick_rate",        szDefaultTickRate,  sizeof (szDefaultTickRate)))
+                            {
+                                if (_Get_From_Kv_File_(_SV_TICK_RATE_KV_TITLE_, szTickRateKvFile, szFullIpAddr, "hours_for_not_default",    szHours,            sizeof (szHours)))
+                                {
+                                    if (strlen(szTickRate) > 0 && strlen(szDefaultTickRate) > 0 && strlen(szHours) > 0)
+                                    {
+                                        FormatTime(szCurrentHour, sizeof (szCurrentHour), "%H");
+
+                                        nTickRate =                             StringToInt(szTickRate);
+                                        nDefaultTickRate =                      StringToInt(szDefaultTickRate);
+
+                                        fIntervalPerTick =                      1.0 / float(nTickRate);
+                                        fDefaultIntervalPerTick =               1.0 / float(nDefaultTickRate);
+
+                                        if (StrContains(szHours, szCurrentHour) != -1)
+                                        {
+                                            StoreToAddress(hTickInterval,       view_as<int>(fIntervalPerTick), NumberType_Int32);
+                                            StoreToAddress(hIntervalPerTick,    view_as<int>(fIntervalPerTick), NumberType_Int32);
+                                        }
+
+                                        else
+                                        {
+                                            StoreToAddress(hTickInterval,       view_as<int>(fDefaultIntervalPerTick), NumberType_Int32);
+                                            StoreToAddress(hIntervalPerTick,    view_as<int>(fDefaultIntervalPerTick), NumberType_Int32);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         CloseHandle(hData);
 
         hData = INVALID_HANDLE;
+    }
+}
+
+public void OnConfigsExecuted()
+{
+    static char szHostName[PLATFORM_MAX_PATH] = { 0, ... }, szHostPort[PLATFORM_MAX_PATH] = { 0, ... }, szTags[PLATFORM_MAX_PATH] = { 0, ... },
+        szTickRate[PLATFORM_MAX_PATH] = { 0, ... };
+
+    static ConVar hHostName = null, hHostPort = null, hTags = null;
+    static int nTickRate = 0;
+
+    nTickRate = _Get_Sv_Tick_Rate_();
+
+    IntToString(nTickRate, szTickRate, sizeof (szTickRate));
+
+    ServerCommand("exec %d_tickrate.cfg", nTickRate);
+
+    if (hHostName == null)
+    {
+        hHostName = FindConVar("hostname");
+    }
+
+    if (hHostPort == null)
+    {
+        hHostPort = FindConVar("hostport");
+    }
+
+    if (hTags == null)
+    {
+        hTags =     FindConVar("sv_tags");
+    }
+
+    if (hHostName != null)
+    {
+        hHostName.GetString(szHostName, sizeof (szHostName));
+    }
+
+    if (hHostPort != null)
+    {
+        hHostPort.GetString(szHostPort, sizeof (szHostPort));
+    }
+
+    if (hTags != null)
+    {
+        hTags.GetString(szTags,         sizeof (szTags));
+    }
+
+    ReplaceString(szHostName,           sizeof (szHostName),    "<TICK>", szTickRate, false);
+    ReplaceString(szHostName,           sizeof (szHostName),    "<PORT>", szHostPort, false);
+
+    ReplaceString(szTags,               sizeof (szTags),        "<TICK>", szTickRate, false);
+    ReplaceString(szTags,               sizeof (szTags),        "<PORT>", szHostPort, false);
+
+    if (hHostName != null)
+    {
+        hHostName.SetString(szHostName, true);
+    }
+
+    if (hTags != null)
+    {
+        hTags.SetString(szTags,         true);
     }
 }
 
@@ -590,6 +813,36 @@ public void OnMapEnd()
             UnhookConVarChange(g_hSvFullAllTalk,    _Con_Var_Change_);
 
             g_bAllTalkConVarChangeHooked =          false;
+        }
+    }
+
+    if (g_hHostName != INVALID_HANDLE)
+    {
+        if (g_bHostNameConVarChangeHooked)
+        {
+            UnhookConVarChange(g_hHostName,         _Con_Var_Change_);
+
+            g_bHostNameConVarChangeHooked =         false;
+        }
+    }
+
+    if (g_hSvTags != INVALID_HANDLE)
+    {
+        if (g_bSvTagsConVarChangeHooked)
+        {
+            UnhookConVarChange(g_hSvTags,           _Con_Var_Change_);
+
+            g_bSvTagsConVarChangeHooked =           false;
+        }
+    }
+
+    if (g_hSuicideScore != INVALID_HANDLE)
+    {
+        if (g_bSScoreConVarChangeHooked)
+        {
+            UnhookConVarChange(g_hSuicideScore,     _Con_Var_Change_);
+
+            g_bSScoreConVarChangeHooked =           false;
         }
     }
 
@@ -777,11 +1030,22 @@ public Action OnPlayerRunCmd(int nEntity, int& nButtons, int& nImpulse, float fV
 
 public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] szNew)
 {
+    static char szBuffer[PLATFORM_MAX_PATH] = { 0, ... }, szHostPort[PLATFORM_MAX_PATH] = { 0, ... }, szTickRate[PLATFORM_MAX_PATH] = { 0, ... };
+    static ConVar hHostPort = null;
+    static int nTickRate = 0;
+
+    if (hHostPort == null)
+    {
+        hHostPort = FindConVar("hostport");
+    }
+
     if (hConVar == g_hBotQuota)
     {
         if (StringToInt(szNew) !=           _BOT_QUOTA_)
         {
-            SetConVarInt(hConVar,           _BOT_QUOTA_);
+            IntToString(_BOT_QUOTA_,        szBuffer, sizeof (szBuffer));
+
+            SetConVarString(hConVar,        szBuffer, true);
         }
     }
 
@@ -789,7 +1053,63 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
     {
         if (StringToInt(szNew) !=           _SV_FULL_ALLTALK_)
         {
-            SetConVarInt(hConVar,           _SV_FULL_ALLTALK_);
+            IntToString(_SV_FULL_ALLTALK_,  szBuffer, sizeof (szBuffer));
+
+            SetConVarString(hConVar,        szBuffer, true);
+        }
+    }
+
+    else if (hConVar == g_hSuicideScore)
+    {
+        if (StringToInt(szNew) !=           _SUICIDE_SCORE_)
+        {
+            IntToString(_SUICIDE_SCORE_,    szBuffer, sizeof (szBuffer));
+
+            SetConVarString(hConVar,        szBuffer, true);
+        }
+    }
+
+    else if (hConVar == g_hHostName)
+    {
+        if (hHostPort != null)
+        {
+            hHostPort.GetString(szHostPort, sizeof (szHostPort));
+
+            nTickRate = _Get_Sv_Tick_Rate_();
+
+            IntToString(nTickRate, szTickRate, sizeof (szTickRate));
+
+            strcopy(szBuffer, sizeof (szBuffer), szNew);
+
+            ReplaceString(szBuffer, sizeof (szBuffer), "<TICK>", szTickRate, false);
+            ReplaceString(szBuffer, sizeof (szBuffer), "<PORT>", szHostPort, false);
+
+            if (strcmp(szNew, szBuffer))
+            {
+                SetConVarString(hConVar, szBuffer, true);
+            }
+        }
+    }
+
+    else if (hConVar == g_hSvTags)
+    {
+        if (hHostPort != null)
+        {
+            hHostPort.GetString(szHostPort, sizeof (szHostPort));
+
+            nTickRate = _Get_Sv_Tick_Rate_();
+
+            IntToString(nTickRate, szTickRate, sizeof (szTickRate));
+
+            strcopy(szBuffer, sizeof (szBuffer), szNew);
+
+            ReplaceString(szBuffer, sizeof (szBuffer), "<TICK>", szTickRate, false);
+            ReplaceString(szBuffer, sizeof (szBuffer), "<PORT>", szHostPort, false);
+
+            if (strcmp(szNew, szBuffer))
+            {
+                SetConVarString(hConVar, szBuffer, true);
+            }
         }
     }
 }
@@ -1118,6 +1438,37 @@ public Action _SM_CVar_(int nClient, int nArgs)
             PrintToConsole(nClient, "%s [ %s ]",            szConVarName, szConVarVal);
 
             PrintToChat(nClient,    " \x09%s\x0B [ %s ]",   szConVarName, szConVarVal);
+        }
+    }
+
+    return Plugin_Handled;
+}
+
+public Action _SM_Exec_Tick_Cfg_(int nClient, int nArgs)
+{
+    static char szConfigFileName[PLATFORM_MAX_PATH] = { 0, ... };
+
+    if (nClient > 0 && (!IsClientConnected(nClient) || !IsClientInGame(nClient)))
+    {
+        return Plugin_Handled;
+    }
+
+    FormatEx(szConfigFileName, sizeof (szConfigFileName), "%d_tickrate.cfg", _Get_Sv_Tick_Rate_());
+
+    ServerCommand("exec %s", szConfigFileName);
+
+    switch (nClient)
+    {
+        case 0:
+        {
+            PrintToServer("Executed [ %s ]",                    szConfigFileName);
+        }
+
+        default:
+        {
+            PrintToConsole(nClient, "Executed [ %s ]",          szConfigFileName);
+
+            PrintToChat(nClient,    " \x09Executed\x0B [ %s ]", szConfigFileName);
         }
     }
 
