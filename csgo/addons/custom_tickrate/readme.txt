@@ -14,12 +14,12 @@ Linux Process Priority Class
 
     From Low Priority [Worse] To High Priority [Better]
 
-        IDLE_PRIORITY_CLASS             =       -2
-        BELOW_NORMAL_PRIORITY_CLASS     =       -4
-        NORMAL_PRIORITY_CLASS           =       -8
-        ABOVE_NORMAL_PRIORITY_CLASS     =       -12
-        HIGH_PRIORITY_CLASS             =       -16
-        REALTIME_PRIORITY_CLASS         =       -20
+        IDLE_PRIORITY_CLASS             =   19      18      17      16      15      14      13      12
+        BELOW_NORMAL_PRIORITY_CLASS     =   11      10      9       8       7       6       5       4
+        NORMAL_PRIORITY_CLASS           =   3       2       1       0       -1      -2      -3      -4
+        ABOVE_NORMAL_PRIORITY_CLASS     =   -5      -6      -7      -8      -9
+        HIGH_PRIORITY_CLASS             =   -10     -11     -12     -13     -14     -15     -16     -17
+        REALTIME_PRIORITY_CLASS         =   -18     -19     -20
 
 Valid Tick Rates
 

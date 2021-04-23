@@ -1,0 +1,6 @@
+"Metamod Plugin"
+{
+    "alias"     "fake_sendto_queries"
+
+    "file"      "addons/fake_sendto_queries/bin/fake_sendto_queries_mm"
+}

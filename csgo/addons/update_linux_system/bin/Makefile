@@ -1,6 +1,6 @@
 
 CMD += gcc
-OUT += custom_tickrate_mm.so
+OUT += update_linux_system_mm.so
 SRC += stub_mm.cpp
 
 LIB += ../hl2sdk-csgo/lib/linux/tier1_i486.a
