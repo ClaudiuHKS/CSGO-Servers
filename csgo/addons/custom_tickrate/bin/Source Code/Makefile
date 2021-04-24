@@ -1,12 +1,13 @@
 
 CMD += gcc
-OUT += update_linux_system_mm.so
+OUT += custom_tickrate_mm.so
 SRC += stub_mm.cpp
 
 LIB += ../hl2sdk-csgo/lib/linux/tier1_i486.a
-LIB += ../hl2sdk-csgo/lib/linux/libvstdlib.so
-LIB += ../hl2sdk-csgo/lib/linux/libtier0.so
 LIB += ../hl2sdk-csgo/lib/linux/interfaces_i486.a
+
+LIB += libvstdlib.so
+LIB += libtier0.so
 
 DEF += -DCOMPILER_GCC
 DEF += -DPOSIX
