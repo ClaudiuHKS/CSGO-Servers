@@ -30,6 +30,7 @@
         SearchPaths
         {
             GameBin |gameinfo_path|addons/metamod/bin
+
             Game    |gameinfo_path|.
             Game    csgo
         }
