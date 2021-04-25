@@ -3,10 +3,9 @@
  * MAIN REQUIREMENTS
  */
 
-#include < sourcemod >
-#include < cstrike >
-#include < sdktools >
-#include < sdkhooks >
+#include <sourcemod>
+#include <sdktools>
+#include <sdkhooks>
 
 
 /**
@@ -29,5 +28,5 @@ public Plugin myinfo =
 
 public Action OnPlayerRunCmd(int nEntity, int& nButtons, int& nImpulse, float fVelocity[3], float fAngles[3], int& nWeapon, int& nSubType, int& nCmdNum, int& nTickCount, int& nSeed, int nMouseDir[2])
 {
-    nButtons |= (1 << 22);
+    nButtons |= IN_BULLRUSH;
 }

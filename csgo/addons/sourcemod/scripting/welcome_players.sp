@@ -3,15 +3,25 @@
  * MAIN REQUIREMENTS
  */
 
-#include < sourcemod >
-#include < cstrike >
-#include < sdktools >
-#include < sdkhooks >
+#include <sourcemod>
+#include <sdktools>
+#include <sdkhooks>
+
+#if !defined    CS_TEAM_T
+    #define     CS_TEAM_T       (2)
+#endif
+
+#if !defined    CS_TEAM_CT
+    #define     CS_TEAM_CT      (3)
+#endif
 
 
 /**
  * CUSTOM DEFINITIONS TO BE EDITED
  */
+
+#define _WELCOME_CON_MSG_1_         "Welcome. Committing suicide will not alter your score. Unlimited team changes are allowed. The voting system is enabled."
+#define _WELCOME_CON_MSG_2_         "You may /rs, /map, /votemap, /voterr or /voterestart."
 
 #define _WELCOME_MSG_1_             " \x01\x0BWelcome\x01. Committing\x09 suicide\x01 will not alter your\x04 score\x01. Unlimited\x09 team changes\x01 are\x04 allowed\x01. The\x09 voting system\x01 is\x04 enabled\x01."
 #define _WELCOME_MSG_2_             " \x01You may\x05 /rs\x01,\x05 /map\x01,\x05 /votemap\x01,\x05 /voterr\x01 or\x05 /voterestart\x01."
@@ -132,6 +142,9 @@ public void _Player_Team_(Event hEv, const char[] szName, bool bNoBC)
     )
     {
         g_bMsgShown[nEntity] = true;
+
+        PrintToConsole(nEntity, _WELCOME_CON_MSG_1_);
+        PrintToConsole(nEntity, _WELCOME_CON_MSG_2_);
 
         PrintToChat(nEntity, _WELCOME_MSG_1_);
         PrintToChat(nEntity, _WELCOME_MSG_2_);

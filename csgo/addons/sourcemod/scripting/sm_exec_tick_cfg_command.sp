@@ -3,7 +3,7 @@
  * MAIN REQUIREMENTS
  */
 
-#include < sourcemod >
+#include <sourcemod>
 
 
 /**

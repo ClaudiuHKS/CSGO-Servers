@@ -3,18 +3,29 @@
  * MAIN REQUIREMENTS
  */
 
-#include < sourcemod >
-#include < cstrike >
-#include < sdktools >
-#include < sdkhooks >
+#include <sourcemod>
+#include <sdktools>
+#include <sdkhooks>
+#include <cstrike>
 
 
 /**
  * CUSTOM DEFINITIONS TO BE EDITED
  */
 
+#define _WELCOME_CON_MSG_1_         "Welcome. Committing suicide will not alter your score. Unlimited team changes are allowed. The voting system is enabled."
+#define _WELCOME_CON_MSG_2_         "You may /rs, /map, /votemap, /voterr or /voterestart."
+
 #define _WELCOME_MSG_1_             " \x01\x0BWelcome\x01. Committing\x09 suicide\x01 will not alter your\x04 score\x01. Unlimited\x09 team changes\x01 are\x04 allowed\x01. The\x09 voting system\x01 is\x04 enabled\x01."
 #define _WELCOME_MSG_2_             " \x01You may\x05 /rs\x01,\x05 /map\x01,\x05 /votemap\x01,\x05 /voterr\x01 or\x05 /voterestart\x01."
+
+#define _SV_MAX_RATE_               (786432) // Maximum INT Value That 'sv_maxrate' Can Have In CS:GO
+
+#define _RATE_CON_MSG_1_            "You are using rate %s. We recommend the maximum, rate %s."
+#define _RATE_CON_MSG_2_            "You can type it in your console. You will also need a strong internet connection."
+
+#define _RATE_MSG_1_                " \x01You are using\x05 rate %s\x01. We recommend the maximum,\x09 rate %s\x01."
+#define _RATE_MSG_2_                " \x01You can type it in your\x0B console\x01. You will also need a\x04 strong internet connection\x01."
 
 #define _BOT_QUOTA_                 (2) // bot_quota
 #define _SV_FULL_ALLTALK_           (1) // sv_full_alltalk
@@ -60,6 +71,7 @@ public Plugin myinfo =
  */
 
 bool g_bMsgShown[MAXPLAYERS] =          { false, ... };
+bool g_bRateMsgShown[MAXPLAYERS] =      { false, ... };
 
 Handle g_hBotQuota =                    INVALID_HANDLE;
 Handle g_hSvFullAllTalk =               INVALID_HANDLE;
@@ -404,6 +416,18 @@ static int _Get_Offs_(int nEntity, const char[] szProp)
 /**
  * CUSTOM PUBLIC FORWARDS
  */
+
+public APLRes AskPluginLoad2(Handle hSelf, bool bLateLoaded, char[] szError, int nErrorMaxLen)
+{
+    if (Engine_CSGO != GetEngineVersion())
+    {
+        FormatEx(szError, nErrorMaxLen, "This Plug-in Only Works On Counter-Strike: Global Offensive");
+
+        return APLRes_Failure;
+    }
+
+    return APLRes_Success;
+}
 
 public void OnPluginStart()
 {
@@ -915,7 +939,8 @@ public void OnPluginEnd()
 
 public bool OnClientConnect(int nEntity, char[] szError, int nMaxLen)
 {
-    g_bMsgShown[nEntity] = false;
+    g_bMsgShown[nEntity] =              false;
+    g_bRateMsgShown[nEntity] =          false;
 
     return true;
 }
@@ -1060,15 +1085,103 @@ public void OnClientSayCommand_Post(int nEntity, const char[] szCmd, const char[
     }
 }
 
+public Action CS_OnTerminateRound(float& fDelay, CSRoundEndReason& nReason)
+{
+    static float fTimeStamp = 0.0, fTimeNow = 0.0;
+    static int nPlayer = 0, nTeam = 0;
+
+    if (((fTimeNow = GetEngineTime()) - fTimeStamp) > 16.0 || fTimeStamp == 0.0)
+    {
+        fTimeStamp = fTimeNow;
+
+        for (nPlayer = 1; nPlayer < MAXPLAYERS; nPlayer++)
+        {
+            if (g_bRateMsgShown[nPlayer])
+            {
+                continue;
+            }
+
+            if (!IsClientConnected(nPlayer)     ||      !IsClientInGame(nPlayer))
+            {
+                continue;
+            }
+
+            if (IsFakeClient(nPlayer)           ||      IsClientSourceTV(nPlayer)       ||      IsClientReplay(nPlayer))
+            {
+                continue;
+            }
+
+            if (IsClientInKickQueue(nPlayer)    ||      IsClientTimingOut(nPlayer))
+            {
+                continue;
+            }
+
+            nTeam = GetClientTeam(nPlayer);
+
+            if (nTeam != CS_TEAM_T              &&      nTeam != CS_TEAM_CT)
+            {
+                continue;
+            }
+
+            QueryClientConVar(nPlayer, "rate", _Rate_Con_Var_Check_);
+        }
+    }
+}
+
 public Action OnPlayerRunCmd(int nEntity, int& nButtons, int& nImpulse, float fVelocity[3], float fAngles[3], int& nWeapon, int& nSubType, int& nCmdNum, int& nTickCount, int& nSeed, int nMouseDir[2])
 {
-    nButtons |= (1 << 22);
+    nButtons |= IN_BULLRUSH;
 }
 
 
 /**
  * CUSTOM PUBLIC HANDLERS
  */
+
+public void _Rate_Con_Var_Check_(QueryCookie nCookie, int nPlayer, ConVarQueryResult nRes, const char[] szConVarName, const char[] szConVarValue)
+{
+    static char szSvMaxRate[PLATFORM_MAX_PATH] = { 0, ... };
+    static int nPlayerRate = 0, nSvMaxRate = 0;
+    static ConVar hSvMaxRate = null;
+
+    if (nRes == ConVarQuery_Okay)
+    {
+        if (IsClientConnected(nPlayer) && IsClientInGame(nPlayer))
+        {
+            g_bRateMsgShown[nPlayer] = true;
+
+            if (hSvMaxRate == null)
+            {
+                hSvMaxRate =    FindConVar("sv_maxrate");
+            }
+
+            if (hSvMaxRate != null)
+            {
+                hSvMaxRate.GetString(szSvMaxRate,           sizeof (szSvMaxRate));
+
+                nSvMaxRate =    hSvMaxRate.IntValue;
+
+                if (nSvMaxRate  < 1)
+                {
+                    nSvMaxRate  = _SV_MAX_RATE_;
+
+                    IntToString(nSvMaxRate, szSvMaxRate,    sizeof (szSvMaxRate));
+                }
+
+                nPlayerRate =   StringToInt(szConVarValue);
+
+                if (nPlayerRate < nSvMaxRate)
+                {
+                    PrintToConsole(nPlayer, _RATE_CON_MSG_1_,   szConVarValue,  szSvMaxRate);
+                    PrintToConsole(nPlayer, _RATE_CON_MSG_2_);
+
+                    PrintToChat(nPlayer,    _RATE_MSG_1_,       szConVarValue,  szSvMaxRate);
+                    PrintToChat(nPlayer,    _RATE_MSG_2_);
+                }
+            }
+        }
+    }
+}
 
 public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] szNew)
 {
@@ -1212,6 +1325,9 @@ public void _Player_Team_(Event hEv, const char[] szName, bool bNoBC)
     )
     {
         g_bMsgShown[nEntity] = true;
+
+        PrintToConsole(nEntity, _WELCOME_CON_MSG_1_);
+        PrintToConsole(nEntity, _WELCOME_CON_MSG_2_);
 
         PrintToChat(nEntity, _WELCOME_MSG_1_);
         PrintToChat(nEntity, _WELCOME_MSG_2_);

@@ -3,10 +3,9 @@
  * MAIN REQUIREMENTS
  */
 
-#include < sourcemod >
-#include < cstrike >
-#include < sdktools >
-#include < sdkhooks >
+#include <sourcemod>
+#include <sdktools>
+#include <sdkhooks>
 
 
 /**
