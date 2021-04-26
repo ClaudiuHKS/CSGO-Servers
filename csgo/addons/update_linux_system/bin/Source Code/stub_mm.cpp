@@ -12,7 +12,7 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
 
     char szCfgFile[256], szLogFile[256];
 
-#if !defined WIN32 && !defined WINDOWS
+#if !defined WIN32
 
     char szCpuFile[256], szMemFile[256];
 
@@ -20,7 +20,7 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
 
     FILE* pICfgFile, * pOLogFile;
 
-#if !defined WIN32 && !defined WINDOWS
+#if !defined WIN32
 
     FILE* pICpuFile, * pOCpuFile;
 
@@ -42,7 +42,7 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
     snprintf(szCfgFile, sizeof(szCfgFile), "%s/addons/update_linux_system/packages.cfg", pszGameBaseDir);
     snprintf(szLogFile, sizeof(szLogFile), "%s/addons/update_linux_system/status.log", pszGameBaseDir);
 
-#if !defined WIN32 && !defined WINDOWS
+#if !defined WIN32
 
     snprintf(szCpuFile, sizeof(szCpuFile), "%s/addons/update_linux_system/cpuinfo.txt", pszGameBaseDir);
     snprintf(szMemFile, sizeof(szMemFile), "%s/addons/update_linux_system/meminfo.txt", pszGameBaseDir);
@@ -60,7 +60,7 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
 
             fgets(szBuffer, sizeof(szBuffer), pICfgFile);
 
-            for (nIter = 0; nIter < strlen(szBuffer); nIter++)
+            for (nIter = 0; nIter < castValTo_(strlen(szBuffer), int); nIter++)
             {
                 if (szBuffer[nIter] != '\n' && szBuffer[nIter] != '\r')
                 {
@@ -102,7 +102,7 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
         fclose(pICfgFile);
     }
 
-#if !defined WIN32 && !defined WINDOWS
+#if !defined WIN32
 
     if ((pICpuFile = fopen("/proc/cpuinfo", "r")))
     {
@@ -129,7 +129,7 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
 
 #endif
 
-#if !defined WIN32 && !defined WINDOWS
+#if !defined WIN32
 
     if ((pIMemFile = fopen("/proc/meminfo", "r")))
     {

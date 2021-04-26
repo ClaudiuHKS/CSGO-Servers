@@ -107,7 +107,7 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 	static float fTickInterval{ };
 	static int nProcessPriorityClass{ };
 
-#if defined WIN32 || defined WINDOWS
+#if defined WIN32
 
 	static bool bDisableProcessPriorityBoost{ };
 
@@ -175,7 +175,7 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 		RETURN_META_VALUE(MRES_SUPERCEDE, fTickInterval);
 	}
 
-#if defined WIN32 || defined WINDOWS
+#if defined WIN32
 
 	if (jsonTree["Windows Disable Process Priority Boost"].empty())
 	{
@@ -198,7 +198,7 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 
 #endif
 
-#if defined WIN32 || defined WINDOWS
+#if defined WIN32
 
 	if (jsonTree["Windows Process Priority Class"].empty())
 
@@ -211,7 +211,7 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 	{
 		META_CONPRINT("\n***********************************\n");
 
-#if defined WIN32 || defined WINDOWS
+#if defined WIN32
 
 		META_CONPRINTF("Failed To Find The 'Windows Process Priority Class' Setting Into The '%s' File\n\n", strConfigFilePath.c_str());
 		META_CONPRINT("The 'Windows Process Priority Class' Of This Process Will Not Change\n");
@@ -229,7 +229,7 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 	else
 	{
 
-#if defined WIN32 || defined WINDOWS
+#if defined WIN32
 
 		nProcessPriorityClass = jsonTree["Windows Process Priority Class"].get < int >();
 
@@ -241,7 +241,7 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 
 		META_CONPRINT("\n***********************************\n");
 
-#if defined WIN32 || defined WINDOWS
+#if defined WIN32
 
 		META_CONPRINTF("The 'Windows Process Priority Class' Of This Process Changed To '%d'\n", nProcessPriorityClass);
 
@@ -253,7 +253,7 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 
 		META_CONPRINT("***********************************\n\n");
 
-#if defined WIN32 || defined WINDOWS
+#if defined WIN32
 
 		::SetPriorityClass(::GetCurrentProcess(), castValTo_(nProcessPriorityClass, DWORD));
 

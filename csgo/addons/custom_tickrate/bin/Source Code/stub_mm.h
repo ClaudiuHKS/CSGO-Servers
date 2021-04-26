@@ -1,6 +1,6 @@
 #pragma once
 
-#if !defined WIN32 && !defined WINDOWS
+#if !defined WIN32
 
 #	include <sys/resource.h>
 

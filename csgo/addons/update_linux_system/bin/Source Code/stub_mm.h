@@ -2,6 +2,8 @@
 
 #include <ISmmPlugin.h>
 
+#define castValTo_( Value, Type )			( ( Type ) ( Value ) )
+
 class UpdateLinuxSystem : public ISmmPlugin /** Load, Unload */
 {
 
