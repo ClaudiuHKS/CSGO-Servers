@@ -83,7 +83,7 @@ static int _CVar_Flags_Str_(ConVar& hConVar, char[] szStr, int nMaxLen)
         {
             Format(szStr, nMaxLen, "%s$", szStr);
 
-            ReplaceStringEx(szStr, nMaxLen, ", $", "");
+            ReplaceStringEx(szStr, nMaxLen, ", $", "", 3, 0, true);
         }
     }
 }

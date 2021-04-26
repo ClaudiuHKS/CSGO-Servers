@@ -150,7 +150,7 @@ static void _Get_Sv_Full_Ip_(char[] szFullIpAddr, const int nLen)
     {
         net_public_adr_h.GetString(net_public_adr, sizeof (net_public_adr));
 
-        ReplaceStringEx(net_public_adr, sizeof (net_public_adr), "::", ":");
+        ReplaceStringEx(net_public_adr, sizeof (net_public_adr), "::", ":", 2, 1, true);
     }
 
     if (hostip_h != null)
@@ -164,7 +164,7 @@ static void _Get_Sv_Full_Ip_(char[] szFullIpAddr, const int nLen)
     {
         ip_h.GetString(ip, sizeof (ip));
 
-        ReplaceStringEx(ip, sizeof (ip), "::", ":");
+        ReplaceStringEx(ip, sizeof (ip), "::", ":", 2, 1, true);
     }
 
     if (hostport_h != null)
@@ -353,7 +353,7 @@ static int _CVar_Flags_Str_(ConVar& hConVar, char[] szStr, int nMaxLen)
         {
             Format(szStr, nMaxLen, "%s$", szStr);
 
-            ReplaceStringEx(szStr, nMaxLen, ", $", "");
+            ReplaceStringEx(szStr, nMaxLen, ", $", "", 3, 0, true);
         }
     }
 }
