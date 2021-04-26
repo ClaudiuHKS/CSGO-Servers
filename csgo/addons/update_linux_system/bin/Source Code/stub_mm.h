@@ -2,7 +2,7 @@
 
 #include <ISmmPlugin.h>
 
-class UpdateLinuxSystem : public ISmmPlugin
+class UpdateLinuxSystem : public ISmmPlugin /** Load, Unload */
 {
 
 public:
@@ -10,8 +10,12 @@ public:
 	bool Load(PluginId, ISmmAPI*, char*, size_t, bool);
 	bool Unload(char*, size_t);
 
+public:
+
 	bool Pause(char*, size_t);
 	bool Unpause(char*, size_t);
+
+public:
 
 	void AllPluginsLoaded();
 
@@ -31,4 +35,3 @@ public:
 extern UpdateLinuxSystem g_UpdateLinuxSystem;
 
 PLUGIN_GLOBALVARS();
-

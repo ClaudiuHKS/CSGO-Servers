@@ -4,7 +4,8 @@ SH_DECL_HOOK0(IServerGameDLL, GetTickInterval, const, 0, float);
 
 CustomTickRate g_CustomTickRate{ };
 
-static ICvar* g_pICvar_{ };
+static ICvar* g_pICvar_{ }; // #1
+
 static IVEngineServer* g_pIVEngineServer_{ };
 static IFileSystem* g_pIFileSystem_{ };
 static IGameEventManager2* g_pIGameEventManager2_{ };
@@ -18,7 +19,7 @@ static CGlobalVars* g_pCGlobalVars_{ };
 
 static IServerPluginCallbacks* g_pIServerPluginCallbacks_{ };
 
-static std::string g_strBaseGameDir_{ };
+static ::std::string g_strBaseGameDir_{ };
 
 static bool g_bIsHooked_{ };
 
@@ -28,7 +29,14 @@ bool CustomTickRate::Load(PluginId id, ISmmAPI* ismm, char* error, size_t maxlen
 {
 	PLUGIN_SAVEVARS();
 
-	GET_V_IFACE_CURRENT(GetEngineFactory, g_pICvar_, ICvar, CVAR_INTERFACE_VERSION);
+	GET_V_IFACE_CURRENT(GetEngineFactory, g_pICvar_, ICvar, CVAR_INTERFACE_VERSION); // #1
+
+#if SOURCE_ENGINE >= SE_ORANGEBOX
+
+	g_pCVar = g_pICvar_;
+
+#endif
+
 	GET_V_IFACE_CURRENT(GetEngineFactory, g_pIVEngineServer_, IVEngineServer, INTERFACEVERSION_VENGINESERVER);
 	GET_V_IFACE_CURRENT(GetEngineFactory, g_pIFileSystem_, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
 	GET_V_IFACE_CURRENT(GetEngineFactory, g_pIGameEventManager2_, IGameEventManager2, INTERFACEVERSION_GAMEEVENTSMANAGER2);
@@ -51,7 +59,7 @@ bool CustomTickRate::Load(PluginId id, ISmmAPI* ismm, char* error, size_t maxlen
 
 	if (g_strBaseGameDir_.empty())
 	{
-		snprintf(error, maxlen, "Failed To Find The Game Base Directory");
+		::std::snprintf(error, maxlen, "Failed To Find The Game Base Directory");
 
 		META_CONPRINT("\n***********************************\n");
 		META_CONPRINT("Failed To Find The Game Base Directory\n");
@@ -68,12 +76,6 @@ bool CustomTickRate::Load(PluginId id, ISmmAPI* ismm, char* error, size_t maxlen
 
 		g_bIsHooked_ = true;
 	}
-
-#if SOURCE_ENGINE >= SE_ORANGEBOX
-
-	g_pCVar = g_pICvar_;
-
-#endif
 
 	return true;
 }
@@ -99,9 +101,9 @@ bool CustomTickRate::Unload(char* pszError, size_t uErrorMaxLen)
 
 float CustomTickRate::Hook_GetTickInterval() const noexcept
 {
-	static std::string strConfigFilePath{ };
-	static std::ifstream inConfigFile{ };
-	static nlohmann::json jsonTree{ };
+	static ::std::string strConfigFilePath{ };
+	static ::std::ifstream inConfigFile{ };
+	static ::nlohmann::json jsonTree{ };
 	static float fTickInterval{ };
 	static int nProcessPriorityClass{ };
 
@@ -111,7 +113,7 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 
 #endif
 
-	fTickInterval = fDefaultTickRate_;
+	fTickInterval = fDefaultIntervalPerTick_;
 
 	strConfigFilePath.assign(g_strBaseGameDir_ + "/addons/custom_tickrate/settings.cfg");
 
@@ -119,8 +121,8 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 	{
 		META_CONPRINT("\n***********************************\n");
 		META_CONPRINTF("Failed To Find The '%s' File\n\n", strConfigFilePath.c_str());
-		META_CONPRINT("Defaulting To '128' Tick Rate\n");
-		META_CONPRINT("'0.0078125' Tick Interval\n");
+		::std::cout << "Defaulting To '" << nDefaultTickRate_ << "' Tick Rate" << ::std::endl;
+		::std::cout << "'" << ::std::setprecision(maxRealPrecision_) << fTickInterval << "' Tick Interval" << ::std::endl;
 		META_CONPRINT("***********************************\n\n");
 
 		RETURN_META_VALUE(MRES_SUPERCEDE, fTickInterval);
@@ -132,8 +134,8 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 	{
 		META_CONPRINT("\n***********************************\n");
 		META_CONPRINTF("Failed To Open The '%s' File\n\n", strConfigFilePath.c_str());
-		META_CONPRINT("Defaulting To '128' Tick Rate\n");
-		META_CONPRINT("'0.0078125' Tick Interval\n");
+		::std::cout << "Defaulting To '" << nDefaultTickRate_ << "' Tick Rate" << ::std::endl;
+		::std::cout << "'" << ::std::setprecision(maxRealPrecision_) << fTickInterval << "' Tick Interval" << ::std::endl;
 		META_CONPRINT("***********************************\n\n");
 
 		inConfigFile.clear();
@@ -141,7 +143,7 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 		RETURN_META_VALUE(MRES_SUPERCEDE, fTickInterval);
 	}
 
-	jsonTree = nlohmann::json::parse(inConfigFile, nullptr, false, true);
+	jsonTree = ::nlohmann::json::parse(inConfigFile, nullptr, false, true);
 
 	inConfigFile.close();
 
@@ -151,8 +153,21 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 	{
 		META_CONPRINT("\n***********************************\n");
 		META_CONPRINTF("The File '%s' Has Invalid 'Json' Content\n\n", strConfigFilePath.c_str());
-		META_CONPRINT("Defaulting To '128' Tick Rate\n");
-		META_CONPRINT("'0.0078125' Tick Interval\n");
+		::std::cout << "Defaulting To '" << nDefaultTickRate_ << "' Tick Rate" << ::std::endl;
+		::std::cout << "'" << ::std::setprecision(maxRealPrecision_) << fTickInterval << "' Tick Interval" << ::std::endl;
+		META_CONPRINT("***********************************\n\n");
+
+		jsonTree.clear();
+
+		RETURN_META_VALUE(MRES_SUPERCEDE, fTickInterval);
+	}
+
+	if (jsonTree.empty())
+	{
+		META_CONPRINT("\n***********************************\n");
+		META_CONPRINTF("The File '%s' Has No 'Json' Content\n\n", strConfigFilePath.c_str());
+		::std::cout << "Defaulting To '" << nDefaultTickRate_ << "' Tick Rate" << ::std::endl;
+		::std::cout << "'" << ::std::setprecision(maxRealPrecision_) << fTickInterval << "' Tick Interval" << ::std::endl;
 		META_CONPRINT("***********************************\n\n");
 
 		jsonTree.clear();
@@ -178,7 +193,7 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 		META_CONPRINTF("The 'Disable Process Priority Boost' Of This Process Changed To '%s'\n", bDisableProcessPriorityBoost ? "TRUE" : "FALSE");
 		META_CONPRINT("***********************************\n\n");
 
-		SetProcessPriorityBoost(GetCurrentProcess(), ((BOOL)(bDisableProcessPriorityBoost)));
+		::SetProcessPriorityBoost(::GetCurrentProcess(), castValTo_(bDisableProcessPriorityBoost, BOOL));
 	}
 
 #endif
@@ -199,14 +214,15 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 #if defined WIN32 || defined WINDOWS
 
 		META_CONPRINTF("Failed To Find The 'Windows Process Priority Class' Setting Into The '%s' File\n\n", strConfigFilePath.c_str());
+		META_CONPRINT("The 'Windows Process Priority Class' Of This Process Will Not Change\n");
 
 #else
 
 		META_CONPRINTF("Failed To Find The 'Linux Process Priority Class' Setting Into The '%s' File\n\n", strConfigFilePath.c_str());
+		META_CONPRINT("The 'Linux Process Priority Class' Of This Process Will Not Change\n");
 
 #endif
 
-		META_CONPRINT("The Process Priority Class Of This Process Will Not Change\n");
 		META_CONPRINT("***********************************\n\n");
 	}
 
@@ -224,12 +240,22 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 #endif
 
 		META_CONPRINT("\n***********************************\n");
-		META_CONPRINTF("The Process Priority Class Of This Process Changed To %d\n", nProcessPriorityClass);
+
+#if defined WIN32 || defined WINDOWS
+
+		META_CONPRINTF("The 'Windows Process Priority Class' Of This Process Changed To '%d'\n", nProcessPriorityClass);
+
+#else
+
+		META_CONPRINTF("The 'Linux Process Priority Class' Of This Process Changed To '%d'\n", nProcessPriorityClass);
+
+#endif
+
 		META_CONPRINT("***********************************\n\n");
 
 #if defined WIN32 || defined WINDOWS
 
-		SetPriorityClass(GetCurrentProcess(), ((DWORD)(nProcessPriorityClass)));
+		::SetPriorityClass(::GetCurrentProcess(), castValTo_(nProcessPriorityClass, DWORD));
 
 #else
 
@@ -243,8 +269,8 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 	{
 		META_CONPRINT("\n***********************************\n");
 		META_CONPRINTF("Failed To Find The 'Interval Per Tick' Setting Into The '%s' File\n\n", strConfigFilePath.c_str());
-		META_CONPRINT("Defaulting To '128' Tick Rate\n");
-		META_CONPRINT("'0.0078125' Tick Interval\n");
+		::std::cout << "Defaulting To '" << nDefaultTickRate_ << "' Tick Rate" << ::std::endl;
+		::std::cout << "'" << ::std::setprecision(maxRealPrecision_) << fTickInterval << "' Tick Interval" << ::std::endl;
 		META_CONPRINT("***********************************\n\n");
 
 		jsonTree.clear();
@@ -257,10 +283,8 @@ float CustomTickRate::Hook_GetTickInterval() const noexcept
 	jsonTree.clear();
 
 	META_CONPRINT("\n***********************************\n");
-
-	std::cout << "Successfully Set The Interval Per Tick To " << std::setprecision(16) << fTickInterval << std::endl;
-	std::cout << "It Means That The Tick Rate Is Now " << std::setprecision(16) << (1.0f / fTickInterval) << std::endl;
-
+	::std::cout << "Successfully Set The 'Interval Per Tick' Setting To '" << ::std::setprecision(maxRealPrecision_) << fTickInterval << "'" << ::std::endl;
+	::std::cout << "It Means That The Tick Rate Is Now '" << ::std::setprecision(maxRealPrecision_) << (1.0f / fTickInterval) << "'" << ::std::endl;
 	META_CONPRINT("***********************************\n\n");
 
 	RETURN_META_VALUE(MRES_SUPERCEDE, fTickInterval);

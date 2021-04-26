@@ -1,30 +1,34 @@
 #include "stub_mm.h"
 
-UpdateLinuxSystem g_UpdateLinuxSystem{ };
+UpdateLinuxSystem g_UpdateLinuxSystem;
 
 PLUGIN_EXPOSE(UpdateLinuxSystem, g_UpdateLinuxSystem);
 
 bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t maxlen, bool bIsLateLoaded_)
 {
-    char szBuffer[2048];
-    char szTrimmed[2048];
-
-    char szCfgFile[256];
-    char szLogFile[256];
-    char szCpuFile[256];
-    char szMemFile[256];
-
-    FILE* pICfgFile;
-    FILE* pOLogFile;
-    FILE* pIMemFile;
-    FILE* pOMemFile;
-    FILE* pICpuFile;
-    FILE* pOCpuFile;
-
-    int nIter;
-    int nLen;
-
     const char* pszGameBaseDir;
+
+    char szBuffer[2048], szTrimmed[2048];
+
+    char szCfgFile[256], szLogFile[256];
+
+#if !defined WIN32 && !defined WINDOWS
+
+    char szCpuFile[256], szMemFile[256];
+
+#endif
+
+    FILE* pICfgFile, * pOLogFile;
+
+#if !defined WIN32 && !defined WINDOWS
+
+    FILE* pICpuFile, * pOCpuFile;
+
+    FILE* pIMemFile, * pOMemFile;
+
+#endif
+
+    int nIter, nLen;
 
     PLUGIN_SAVEVARS();
 
@@ -35,10 +39,15 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
         return false;
     }
 
-    snprintf(szCfgFile, sizeof (szCfgFile), "%s/addons/update_linux_system/packages.cfg", pszGameBaseDir);
-    snprintf(szLogFile, sizeof (szLogFile), "%s/addons/update_linux_system/status.log", pszGameBaseDir);
-    snprintf(szCpuFile, sizeof (szCpuFile), "%s/addons/update_linux_system/cpuinfo.txt", pszGameBaseDir);
-    snprintf(szMemFile, sizeof (szMemFile), "%s/addons/update_linux_system/meminfo.txt", pszGameBaseDir);
+    snprintf(szCfgFile, sizeof(szCfgFile), "%s/addons/update_linux_system/packages.cfg", pszGameBaseDir);
+    snprintf(szLogFile, sizeof(szLogFile), "%s/addons/update_linux_system/status.log", pszGameBaseDir);
+
+#if !defined WIN32 && !defined WINDOWS
+
+    snprintf(szCpuFile, sizeof(szCpuFile), "%s/addons/update_linux_system/cpuinfo.txt", pszGameBaseDir);
+    snprintf(szMemFile, sizeof(szMemFile), "%s/addons/update_linux_system/meminfo.txt", pszGameBaseDir);
+
+#endif
 
     if ((pICfgFile = fopen(szCfgFile, "r")))
     {
@@ -49,13 +58,21 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
 
             nLen = 0;
 
-            fgets(szBuffer, sizeof (szBuffer), pICfgFile);
+            fgets(szBuffer, sizeof(szBuffer), pICfgFile);
 
             for (nIter = 0; nIter < strlen(szBuffer); nIter++)
             {
                 if (szBuffer[nIter] != '\n' && szBuffer[nIter] != '\r')
                 {
-                    szTrimmed[nLen] = ((szBuffer[nIter] == '\t') ? (' ') : (szBuffer[nIter]));
+                    if (szBuffer[nIter] == '\t')
+                    {
+                        szTrimmed[nLen] = ' ';
+                    }
+
+                    else
+                    {
+                        szTrimmed[nLen] = szBuffer[nIter];
+                    }
 
                     nLen++;
                 }
@@ -85,6 +102,8 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
         fclose(pICfgFile);
     }
 
+#if !defined WIN32 && !defined WINDOWS
+
     if ((pICpuFile = fopen("/proc/cpuinfo", "r")))
     {
         unlink(szCpuFile);
@@ -93,7 +112,7 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
         {
             szBuffer[0] = '\0';
 
-            fgets(szBuffer, sizeof (szBuffer), pICpuFile);
+            fgets(szBuffer, sizeof(szBuffer), pICpuFile);
 
             pOCpuFile = fopen(szCpuFile, "a");
 
@@ -108,6 +127,10 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
         fclose(pICpuFile);
     }
 
+#endif
+
+#if !defined WIN32 && !defined WINDOWS
+
     if ((pIMemFile = fopen("/proc/meminfo", "r")))
     {
         unlink(szMemFile);
@@ -116,7 +139,7 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
         {
             szBuffer[0] = '\0';
 
-            fgets(szBuffer, sizeof (szBuffer), pIMemFile);
+            fgets(szBuffer, sizeof(szBuffer), pIMemFile);
 
             pOMemFile = fopen(szMemFile, "a");
 
@@ -131,12 +154,14 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
         fclose(pIMemFile);
     }
 
+#endif
+
     return true;
 }
 
 bool UpdateLinuxSystem::Unload(char* pszError, size_t uErrorMaxLen)
 {
-	return true;
+    return true;
 }
 
 void UpdateLinuxSystem::AllPluginsLoaded()
@@ -146,51 +171,50 @@ void UpdateLinuxSystem::AllPluginsLoaded()
 
 bool UpdateLinuxSystem::Pause(char* pszError_, size_t uErrorMaxLen_)
 {
-	return true;
+    return true;
 }
 
 bool UpdateLinuxSystem::Unpause(char* pszError_, size_t uErrorMaxLen_)
 {
-	return true;
+    return true;
 }
 
 const char* UpdateLinuxSystem::GetLicense()
 {
-	return "MIT";
+    return "MIT";
 }
 
 const char* UpdateLinuxSystem::GetVersion()
 {
-	return __DATE__;
+    return __DATE__;
 }
 
 const char* UpdateLinuxSystem::GetDate()
 {
-	return __DATE__;
+    return __DATE__;
 }
 
 const char* UpdateLinuxSystem::GetLogTag()
 {
-	return "ULS";
+    return "ULS";
 }
 
 const char* UpdateLinuxSystem::GetAuthor()
 {
-	return "Hattrick HKS";
+    return "Hattrick HKS";
 }
 
 const char* UpdateLinuxSystem::GetDescription()
 {
-	return "Helps Owners Update Their Linux System";
+    return "Helps Owners Update Their Linux System";
 }
 
 const char* UpdateLinuxSystem::GetName()
 {
-	return "Update Linux System";
+    return "Update Linux System";
 }
 
 const char* UpdateLinuxSystem::GetURL()
 {
-	return "https://hattrick.go.ro/";
+    return "https://hattrick.go.ro/";
 }
-

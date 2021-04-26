@@ -26,7 +26,11 @@
 #include <igameevents.h>
 #include <iplayerinfo.h>
 
-class CustomTickRate : public ISmmPlugin, public IMetamodListener
+#define castValTo_( Value, Type )       ( ( Type ) ( Value ) )
+
+#define maxRealPrecision_               ( ::std::numeric_limits < long double > ::max_digits10 )
+
+class CustomTickRate : public ISmmPlugin /** Load, Unload */, public IMetamodListener /** OnVSPListening */
 {
 
 public:
@@ -34,8 +38,12 @@ public:
 	bool Load(PluginId, ISmmAPI*, char*, size_t, bool);
 	bool Unload(char*, size_t);
 
+public:
+
 	bool Pause(char*, size_t);
 	bool Unpause(char*, size_t);
+
+public:
 
 	void AllPluginsLoaded();
 
@@ -60,7 +68,8 @@ public:
 
 private:
 
-	static constexpr auto fDefaultTickRate_{ 0.0078125f, };
+	static constexpr auto nDefaultTickRate_{ 128, /** Yes, this value can be changed. */ };
+	static constexpr auto fDefaultIntervalPerTick_{ 1.0f / castValTo_(nDefaultTickRate_, float), };
 
 };
 
