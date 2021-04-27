@@ -26,9 +26,9 @@ public Plugin myinfo =
  * GLOBAL VARIABLES
  */
 
-Handle g_hSvTags =                      INVALID_HANDLE;
+static Handle g_hSvTags =                       INVALID_HANDLE;
 
-bool g_bSvTagsConVarChangeHooked =      false;
+static bool g_bSvTagsConVarChangeHooked =       false;
 
 
 /**

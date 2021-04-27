@@ -40,12 +40,34 @@ public Plugin myinfo =
  * GLOBAL VARIABLES
  */
 
-bool g_bRateMsgShown[MAXPLAYERS] =      { false, ... };
+static bool g_bRateMsgShown[MAXPLAYERS] =       { false, ... };
+
+static float g_fRateMsgTimeStamp =              0.0;
 
 
 /**
  * CUSTOM PUBLIC FORWARDS
  */
+
+public void OnPluginStart()
+{
+    OnMapStart();
+}
+
+public void OnMapStart()
+{
+    g_fRateMsgTimeStamp = 0.0;
+}
+
+public void OnMapEnd()
+{
+    g_fRateMsgTimeStamp = 0.0;
+}
+
+public void OnPluginEnd()
+{
+    OnMapStart();
+}
 
 public bool OnClientConnect(int nEntity, char[] szError, int nMaxLen)
 {
@@ -56,12 +78,12 @@ public bool OnClientConnect(int nEntity, char[] szError, int nMaxLen)
 
 public Action CS_OnTerminateRound(float& fDelay, CSRoundEndReason& nReason)
 {
-    static float fTimeStamp = 0.0, fTimeNow = 0.0;
+    static float fTimeNow = 0.0;
     static int nPlayer = 0, nTeam = 0;
 
-    if (((fTimeNow = GetEngineTime()) - fTimeStamp) > 16.0 || fTimeStamp == 0.0)
+    if (((fTimeNow = GetEngineTime()) - g_fRateMsgTimeStamp) > 16.0 || g_fRateMsgTimeStamp == 0.0)
     {
-        fTimeStamp = fTimeNow;
+        g_fRateMsgTimeStamp = fTimeNow;
 
         for (nPlayer = 1; nPlayer < MAXPLAYERS; nPlayer++)
         {

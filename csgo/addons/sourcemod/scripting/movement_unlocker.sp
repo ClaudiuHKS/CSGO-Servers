@@ -26,13 +26,13 @@ public Plugin myinfo =
  * GLOBAL VARIABLES
  */
 
-int g_nPatchSize =                  -1;
-int g_nPatchOffs =                  -1;
-int g_nPatchOrigBytes[512] =        { 0, ... };
+static int g_nPatchSize =               -1;
+static int g_nPatchOffs =               -1;
+static int g_nPatchOrigBytes[512] =     { 0, ... };
 
-Address g_hPatchAddr =              Address_Null;
+static Address g_hPatchAddr =           Address_Null;
 
-bool g_bPatchStatus =               false;
+static bool g_bPatchStatus =            false;
 
 
 /**

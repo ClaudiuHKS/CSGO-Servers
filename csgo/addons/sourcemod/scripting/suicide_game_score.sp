@@ -41,13 +41,13 @@ public Plugin myinfo =
  * GLOBAL VARIABLES
  */
 
-Handle g_hSuicideScore =                INVALID_HANDLE;
-Handle g_hSuicidePenalty =              INVALID_HANDLE;
+static Handle g_hSuicideScore =                 INVALID_HANDLE;
+static Handle g_hSuicidePenalty =               INVALID_HANDLE;
 
-bool g_bPlayerDeathHooked =             false;
+static bool g_bPlayerDeathHooked =              false;
 
-bool g_bSScoreConVarChangeHooked =      false;
-bool g_bSPenConVarChangeHooked =        false;
+static bool g_bSScoreConVarChangeHooked =       false;
+static bool g_bSPenConVarChangeHooked =         false;
 
 
 /**

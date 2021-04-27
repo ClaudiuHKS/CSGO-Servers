@@ -33,9 +33,9 @@ public Plugin myinfo =
  * GLOBAL VARIABLES
  */
 
-Handle g_hBotQuota =                INVALID_HANDLE;
+static Handle g_hBotQuota =                 INVALID_HANDLE;
 
-bool g_bQuotaConVarChangeHooked =   false;
+static bool g_bQuotaConVarChangeHooked =    false;
 
 
 /**

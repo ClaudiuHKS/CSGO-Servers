@@ -70,33 +70,35 @@ public Plugin myinfo =
  * GLOBAL VARIABLES
  */
 
-bool g_bMsgShown[MAXPLAYERS] =          { false, ... };
-bool g_bRateMsgShown[MAXPLAYERS] =      { false, ... };
+static bool g_bMsgShown[MAXPLAYERS] =           { false, ... };
+static bool g_bRateMsgShown[MAXPLAYERS] =       { false, ... };
 
-Handle g_hBotQuota =                    INVALID_HANDLE;
-Handle g_hSvFullAllTalk =               INVALID_HANDLE;
-Handle g_hHostName =                    INVALID_HANDLE;
-Handle g_hSvTags =                      INVALID_HANDLE;
-Handle g_hSuicideScore =                INVALID_HANDLE;
-Handle g_hSuicidePenalty =              INVALID_HANDLE;
+static Handle g_hBotQuota =                     INVALID_HANDLE;
+static Handle g_hSvFullAllTalk =                INVALID_HANDLE;
+static Handle g_hHostName =                     INVALID_HANDLE;
+static Handle g_hSvTags =                       INVALID_HANDLE;
+static Handle g_hSuicideScore =                 INVALID_HANDLE;
+static Handle g_hSuicidePenalty =               INVALID_HANDLE;
 
-int g_nPatchSize =                      -1;
-int g_nPatchOffs =                      -1;
-int g_nPatchOrigBytes[512] =            { 0, ... };
+static int g_nPatchSize =                       -1;
+static int g_nPatchOffs =                       -1;
+static int g_nPatchOrigBytes[512] =             { 0, ... };
 
-Address g_hPatchAddr =                  Address_Null;
+static Address g_hPatchAddr =                   Address_Null;
 
-bool g_bPatchStatus =                   false;
+static bool g_bPatchStatus =                    false;
 
-bool g_bPlayerDeathHooked =             false;
-bool g_bPlayerTeamHooked =              false;
+static bool g_bPlayerDeathHooked =              false;
+static bool g_bPlayerTeamHooked =               false;
 
-bool g_bQuotaConVarChangeHooked =       false;
-bool g_bAllTalkConVarChangeHooked =     false;
-bool g_bHostNameConVarChangeHooked =    false;
-bool g_bSvTagsConVarChangeHooked =      false;
-bool g_bSScoreConVarChangeHooked =      false;
-bool g_bSPenConVarChangeHooked =        false;
+static bool g_bQuotaConVarChangeHooked =        false;
+static bool g_bAllTalkConVarChangeHooked =      false;
+static bool g_bHostNameConVarChangeHooked =     false;
+static bool g_bSvTagsConVarChangeHooked =       false;
+static bool g_bSScoreConVarChangeHooked =       false;
+static bool g_bSPenConVarChangeHooked =         false;
+
+static float g_fRateMsgTimeStamp =              0.0;
 
 
 /**
@@ -431,8 +433,8 @@ public APLRes AskPluginLoad2(Handle hSelf, bool bLateLoaded, char[] szError, int
 
 public void OnPluginStart()
 {
-    RegAdminCmd("sm_cvar",              _SM_CVar_,              ADMFLAG_CONVARS,    _DESC_SM_CVAR_);
-    RegAdminCmd("sm_exec_tick_cfg",     _SM_Exec_Tick_Cfg_,     ADMFLAG_CONFIG,     _DESC_SM_EXEC_TICK_CFG_);
+    RegAdminCmd("sm_cvar",              _SM_CVar_,              ADMFLAG_CONVARS,    _DESC_SM_CVAR_,             "cvar");
+    RegAdminCmd("sm_exec_tick_cfg",     _SM_Exec_Tick_Cfg_,     ADMFLAG_CONFIG,     _DESC_SM_EXEC_TICK_CFG_,    "exec");
 
     OnMapStart();
 
@@ -755,6 +757,8 @@ public void OnMapStart()
 
         hData = INVALID_HANDLE;
     }
+
+    g_fRateMsgTimeStamp = 0.0;
 }
 
 public void OnConfigsExecuted()
@@ -930,6 +934,8 @@ public void OnMapEnd()
             }
         }
     }
+
+    g_fRateMsgTimeStamp = 0.0;
 }
 
 public void OnPluginEnd()
@@ -1087,12 +1093,12 @@ public void OnClientSayCommand_Post(int nEntity, const char[] szCmd, const char[
 
 public Action CS_OnTerminateRound(float& fDelay, CSRoundEndReason& nReason)
 {
-    static float fTimeStamp = 0.0, fTimeNow = 0.0;
+    static float fTimeNow = 0.0;
     static int nPlayer = 0, nTeam = 0;
 
-    if (((fTimeNow = GetEngineTime()) - fTimeStamp) > 16.0 || fTimeStamp == 0.0)
+    if (((fTimeNow = GetEngineTime()) - g_fRateMsgTimeStamp) > 16.0 || g_fRateMsgTimeStamp == 0.0)
     {
-        fTimeStamp = fTimeNow;
+        g_fRateMsgTimeStamp = fTimeNow;
 
         for (nPlayer = 1; nPlayer < MAXPLAYERS; nPlayer++)
         {

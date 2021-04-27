@@ -45,9 +45,9 @@ public Plugin myinfo =
  * GLOBAL VARIABLES
  */
 
-bool g_bMsgShown[MAXPLAYERS] =      { false, ... };
+static bool g_bMsgShown[MAXPLAYERS] =       { false, ... };
 
-bool g_bPlayerTeamHooked =          false;
+static bool g_bPlayerTeamHooked =           false;
 
 
 /**

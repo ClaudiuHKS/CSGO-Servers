@@ -33,9 +33,9 @@ public Plugin myinfo =
  * GLOBAL VARIABLES
  */
 
-Handle g_hSvFullAllTalk =           INVALID_HANDLE;
+static Handle g_hSvFullAllTalk =                INVALID_HANDLE;
 
-bool g_bAllTalkConVarChangeHooked = false;
+static bool g_bAllTalkConVarChangeHooked =      false;
 
 
 /**

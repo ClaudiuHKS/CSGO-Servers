@@ -95,7 +95,7 @@ static int _CVar_Flags_Str_(ConVar& hConVar, char[] szStr, int nMaxLen)
 
 public void OnPluginStart()
 {
-    RegAdminCmd("sm_cvar", _SM_CVar_, ADMFLAG_CONVARS, _DESC_SM_CVAR_);
+    RegAdminCmd("sm_cvar", _SM_CVar_, ADMFLAG_CONVARS, _DESC_SM_CVAR_, "cvar");
 }
 
 

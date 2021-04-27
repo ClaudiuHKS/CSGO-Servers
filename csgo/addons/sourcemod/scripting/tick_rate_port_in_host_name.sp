@@ -26,9 +26,9 @@ public Plugin myinfo =
  * GLOBAL VARIABLES
  */
 
-Handle g_hHostName =                    INVALID_HANDLE;
+static Handle g_hHostName =                     INVALID_HANDLE;
 
-bool g_bHostNameConVarChangeHooked =    false;
+static bool g_bHostNameConVarChangeHooked =     false;
 
 
 /**

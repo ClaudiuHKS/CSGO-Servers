@@ -44,7 +44,7 @@ static int _Get_Sv_Tick_Rate_()
 
 public void OnPluginStart()
 {
-    RegAdminCmd("sm_exec_tick_cfg",     _SM_Exec_Tick_Cfg_,     ADMFLAG_CONFIG,     _DESC_SM_EXEC_TICK_CFG_);
+    RegAdminCmd("sm_exec_tick_cfg",     _SM_Exec_Tick_Cfg_,     ADMFLAG_CONFIG,     _DESC_SM_EXEC_TICK_CFG_,    "exec");
 }
 
 
