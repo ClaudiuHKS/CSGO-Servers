@@ -1,46 +1,74 @@
 
 #if defined     _GeoResolver_included
+
     #endinput
+
 #endif
 
 #define         _GeoResolver_included
 
 #include        < sourcemod >
 
-#define         GR_VarType      2       /** 1 = public, 2 = static, & 3 = stock */
-#define         GR_FunType      3       /** 1 = public, 2 = static, & 3 = stock */
+//
+// Yes, you can edit these two,
+//  if you know what you're doing.
+//
+
+#define         GR_VarType          2       /** 1 = public, 2 = static, & 3 = stock */
+#define         GR_FunType          3       /** 1 = public, 2 = static, & 3 = stock */
 
 #if !defined    GR_VarType
+
     #error      GR_VarType must be 1, 2, or 3.
+
 #endif
 
-#if GR_VarType == 1
+#if     GR_VarType == 1
+
     #define     GR_Var              public
+
 #elseif GR_VarType == 2
+
     #define     GR_Var              static
+
 #elseif GR_VarType == 3
+
     #define     GR_Var              stock
+
 #endif
 
 #if !defined    GR_Var
+
     #error      GR_VarType must be 1, 2, or 3.
+
 #endif
 
 #if !defined    GR_FunType
+
     #error      GR_FunType must be 1, 2, or 3.
+
 #endif
 
-#if GR_FunType == 1
+#if     GR_FunType == 1
+
     #define     GR_Fun              public
+
     #define     GR_NoDefFuncParams
+
 #elseif GR_FunType == 2
+
     #define     GR_Fun              static
+
 #elseif GR_FunType == 3
+
     #define     GR_Fun              stock
+
 #endif
 
 #if !defined    GR_Fun
+
     #error      GR_FunType must be 1, 2, or 3.
+
 #endif
 
 enum GR_Db                              /** MAXMIND®            LOADED  DATABASES   */
@@ -56,6 +84,12 @@ enum GR_Db                              /** MAXMIND®            LOADED  DATABAS
     GEOIP_ISP_LITE  =   1 << 4  ,       /** GeoLiteISP.dat      IS      IN USE      */
     GEOIP_ISP_PAID  =   1 << 5  ,       /** GeoIPISP.dat        IS      IN USE      */
 };
+
+//
+// For example,
+//
+//  GeoR_SetOrder(GEOIP_PAID_FIRST);
+//
 
 enum GR_Order
 {
@@ -151,8 +185,10 @@ native  float   GeoR_Len(           const float     fLatitude1          ,   cons
  * RETURNS WHICH    MAXMIND® DATABASES ARE IN USE
  *
  * GR_Db nDb    =   GeoR_Databases();
+ *
  * if (nDb      ==  GEOIP_NONE)         { ... }
  * if (nDb      &   GEOIP_ISP_PAID)     { ... }
+ *
  */
 
 native  GR_Db       GeoR_Databases      ();
@@ -168,7 +204,7 @@ native  bool        GeoR_Refresh        ();
 native  bool        GeoR_Restart        ();
 
 /**
- * CHANGES  THE  ORDER      [ GEOIP_LITE_FIRST | GEOIP_PAID_FIRST ]
+ * CHANGES  THE  ORDER      [ GEOIP_LITE_FIRST  |   GEOIP_PAID_FIRST ]
  */
 
 native  bool        GeoR_Order          (GR_Order   myOrder);
@@ -391,15 +427,22 @@ GR_Fun  float   GeoR_Longitude(const char[] szIpAddr)
  * RETURNS 0.0  ON FAILURE
  *
  * float fKilometers        =   GeoR_DistancePlrSrv(nClient, false);
+ *
  * if (fKilometers > 0.0)   { ... }
  * else                     { ... }
+ *
  */
 
 #if defined GR_NoDefFuncParams
+
 GR_Fun  float       GeoR_DistancePlrSrv(const int nPlayer,  const bool bImperial)
+
 #else
+
 GR_Fun  float       GeoR_DistancePlrSrv(const int nPlayer,  const bool bImperial = false)
+
 #endif
+
 {
     static char     szPlrIpAddr[PLATFORM_MAX_PATH]                          = "", \
                     szSrvIpAddr[PLATFORM_MAX_PATH]                          = "";
@@ -465,36 +508,93 @@ GR_Fun  float       GeoR_DistancePlrSrv(const int nPlayer,  const bool bImperial
     return GeoR_Distance(fPlrLatitude, fPlrLongitude, fSrvLatitude, fSrvLongitude, bImperial);
 }
 
+//
+// GeoR_DistancePlrSrv
+//
+
+#define GeoR_DistanceSrvPlr(%0,%1)              GeoR_DistancePlrSrv(%0, %1)
+
 #define GeoR_DistancePlayerServer(%0,%1)        GeoR_DistancePlrSrv(%0, %1)
+#define GeoR_DistanceServerPlayer(%0,%1)        GeoR_DistancePlrSrv(%0, %1)
+
+#define GeoR_LengthPlrSrv(%0,%1)                GeoR_DistancePlrSrv(%0, %1)
+#define GeoR_LengthSrvPlr(%0,%1)                GeoR_DistancePlrSrv(%0, %1)
 
 #define GeoR_LengthPlayerServer(%0,%1)          GeoR_DistancePlrSrv(%0, %1)
-#define GeoR_LengthPlrSrv(%0,%1)                GeoR_DistancePlrSrv(%0, %1)
+#define GeoR_LengthServerPlayer(%0,%1)          GeoR_DistancePlrSrv(%0, %1)
+
+#define GeoR_LenPlrSrv(%0,%1)                   GeoR_DistancePlrSrv(%0, %1)
+#define GeoR_LenSrvPlr(%0,%1)                   GeoR_DistancePlrSrv(%0, %1)
 
 #define GeoR_LenPlayerServer(%0,%1)             GeoR_DistancePlrSrv(%0, %1)
-#define GeoR_LenPlrSrv(%0,%1)                   GeoR_DistancePlrSrv(%0, %1)
+#define GeoR_LenServerPlayer(%0,%1)             GeoR_DistancePlrSrv(%0, %1)
+
+//
+// GeoR_AutonomousSysOrg
+//
 
 #define GeoR_AutonomSysOrg(%0,%1,%2)            GeoR_AutonomousSysOrg(%0, %1, %2)
 #define GeoR_AutoSysOrg(%0,%1,%2)               GeoR_AutonomousSysOrg(%0, %1, %2)
 
+//
+// GeoR_ISP
+//
+
 #define GeoR_Isp(%0,%1,%2)                      GeoR_ISP(%0, %1, %2)
+
+//
+// GeoR_Code
+//
 
 #define GeoR_CountryCode(%0,%1,%2)              GeoR_Code(%0, %1, %2)
 #define GeoR_IsoCode(%0,%1,%2)                  GeoR_Code(%0, %1, %2)
 #define GeoR_ISOCode(%0,%1,%2)                  GeoR_Code(%0, %1, %2)
+#define GeoR_IsoCode2(%0,%1,%2)                 GeoR_Code(%0, %1, %2)
+#define GeoR_ISOCode2(%0,%1,%2)                 GeoR_Code(%0, %1, %2)
 #define GeoR_CountryCode2(%0,%1,%2)             GeoR_Code(%0, %1, %2)
 #define GeoR_Code2(%0,%1,%2)                    GeoR_Code(%0, %1, %2)
 
+//
+// GeoR_Code3
+//
+
 #define GeoR_CountryCode3(%0,%1,%2)             GeoR_Code3(%0, %1, %2)
 
-#define GeoR_Dbs()                              GeoR_Db()
+//
+// GeoR_Db | GeoR_Databases
+//
+
 #define GeoR_Database()                         GeoR_Db()
-#define GeoR_DataBases()                        GeoR_Db()
 #define GeoR_DataBase()                         GeoR_Db()
+
+#define GeoR_DataBases()                        GeoR_Db()
+
 #define GeoR_DB()                               GeoR_Db()
+
+#define GeoR_Dbs()                              GeoR_Db()
 #define GeoR_DBs()                              GeoR_Db()
 #define GeoR_DBS()                              GeoR_Db()
 
+//
+// GeoR_Record | GeoR_FullRecord | GeoR_CompleteRecord
+//
+
 #define GeoR_GetRecord(%0,%1,%2)                GeoR_Record(%0, %1, %2)
+
+//
+// GR_Db
+//
+
+#define GR_Database                             GR_Db
+#define GR_DataBase                             GR_Db
+
+#define GR_Databases                            GR_Db
+#define GR_DataBases                            GR_Db
+
+#define GR_DB                                   GR_Db
+#define GR_Dbs                                  GR_Db
+#define GR_DBs                                  GR_Db
+#define GR_DBS                                  GR_Db
 
 public  Extension   __ext_GeoResolver   =
 {
