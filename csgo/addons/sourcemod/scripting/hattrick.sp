@@ -1477,7 +1477,7 @@ public Action _Timer_Ragdoll_Velocity_(Handle hTimer, any nEntity)
     static int m_vecVelocity = 0, m_vecAbsVelocity = 0, m_vecForce = 0, m_vecRagdollVelocity = 0;
     static float fVelocity[3] = { 0.0, ... }, fAbsVelocity[3] = { 0.0, ... }, fForce[3] = { 0.0, ... }, fRagdollVelocity[3] = { 0.0, ... };
 
-    if (IsValidEdict(nEntity) || IsValidEntity(nEntity))
+    if (IsValidEntity(nEntity))
     {
         _PREP_OFFS_(nEntity, m_vecVelocity,             "m_vecVelocity");
         _PREP_OFFS_(nEntity, m_vecAbsVelocity,          "m_vecAbsVelocity");
