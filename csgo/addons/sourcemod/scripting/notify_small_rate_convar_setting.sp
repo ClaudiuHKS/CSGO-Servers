@@ -85,7 +85,7 @@ public Action CS_OnTerminateRound(float& fDelay, CSRoundEndReason& nReason)
     {
         g_fRateMsgTimeStamp = fTimeNow;
 
-        for (nPlayer = 1; nPlayer < MAXPLAYERS; nPlayer++)
+        for (nPlayer = 1; nPlayer <= MaxClients; nPlayer++)
         {
             if (g_bRateMsgShown[nPlayer])
             {

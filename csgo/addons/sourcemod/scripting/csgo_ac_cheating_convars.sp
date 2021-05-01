@@ -71,7 +71,7 @@ public APLRes AskPluginLoad2(Handle hSelf, bool bLateLoaded, char[] szError, int
 
     if (Engine_CSGO != GetEngineVersion()) // Not Installed On A CS:GO Game Server
     {
-        FormatEx(szError, nErrorMaxLen, "This Plug-in Only Works On Counter-Strike: Global Offensive");
+        strcopy(szError, nErrorMaxLen, "This Plug-in Only Works On Counter-Strike: Global Offensive");
 
         return APLRes_Failure; // Stop The Plug-in Load Process
     }

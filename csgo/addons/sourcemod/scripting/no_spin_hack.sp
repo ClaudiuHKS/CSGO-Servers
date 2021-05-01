@@ -44,7 +44,7 @@ static float g_fAng[MAXPLAYERS][3];
 
 public void OnPluginStart()
 {
-    for (int nIter = 1; nIter < MAXPLAYERS; nIter++)
+    for (int nIter = 1; nIter <= MaxClients; nIter++)
     {
         if (IsClientConnected(nIter) && IsClientInGame(nIter))
         {
@@ -55,7 +55,7 @@ public void OnPluginStart()
 
 public void OnPluginEnd()
 {
-    for (int nIter = 1; nIter < MAXPLAYERS; nIter++)
+    for (int nIter = 1; nIter <= MaxClients; nIter++)
     {
         if (IsClientConnected(nIter) && IsClientInGame(nIter))
         {
