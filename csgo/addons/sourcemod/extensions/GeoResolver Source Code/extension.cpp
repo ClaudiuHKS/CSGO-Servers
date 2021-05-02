@@ -1,36 +1,27 @@
 #include "extension.h"
-#include "maxminddb.h"
-#include "GeoIPCity.h"
-#include "sh_string.h"
 
-#if !defined    WIN32
+GeoResolver g_GeoResolver;  SMEXT_LINK(&g_GeoResolver);
 
-#include    <math.h>
+static MMDB_s g_City2Lite;  static bool g_bCity2Lite = false;   // GeoLite2-City.mmdb
+static MMDB_s g_City2Paid;  static bool g_bCity2Paid = false;   // GeoIP2-City.mmdb
 
-#endif
+static GeoIP* g_pCityLite;  static bool g_bCityLite = false;    // GeoLiteCity.dat
+static GeoIP* g_pCityPaid;  static bool g_bCityPaid = false;    // GeoIPCity.dat
 
-GeoResolver g_GeoResolver;      SMEXT_LINK(&g_GeoResolver);
-
-static MMDB_s g_City2Lite;      static bool g_bCity2Lite = false;   // GeoLite2-City.mmdb
-static MMDB_s g_City2Paid;      static bool g_bCity2Paid = false;   // GeoIP2-City.mmdb
-
-static GeoIP* g_pCityLite;      static bool g_bCityLite = false;    // GeoLiteCity.dat
-static GeoIP* g_pCityPaid;      static bool g_bCityPaid = false;    // GeoIPCity.dat
-
-static GeoIP* g_pIspLite;       static bool g_bIspLite = false;     // GeoLiteISP.dat
-static GeoIP* g_pIspPaid;       static bool g_bIspPaid = false;     // GeoIPISP.dat
+static GeoIP* g_pIspLite;   static bool g_bIspLite = false;     // GeoLiteISP.dat
+static GeoIP* g_pIspPaid;   static bool g_bIspPaid = false;     // GeoIPISP.dat
 
 static unsigned int g_uiDb = GR_GEO_DB_NONE;
 static unsigned int g_uiOrder = GR_GEO_ORDER_LITE_FIRST;
 
-static const float g_fPi = castValTo_(M_PI, float);
+static const float g_fPi = xTo(M_PI, float);
 static const float g_fPi180 = g_fPi / 180.0f;
 
-static const unsigned int g_uiZero = castValTo_(0, unsigned int);
+static const unsigned int g_uiZero = xTo(0, unsigned int);
 static const unsigned int g_uiCountryCodes = sizeof(GeoIP_country_code) / sizeof(GeoIP_country_code[0]);
 
-static const char* g_pszcInvalid = grStrInvalid_;
-static const char* g_pszcLibrary = grStrLibrary_;
+static const char* g_pszcInvalid = grInvalid;
+static const char* g_pszcLibrary = grLibrary;
 
 static bool GR_RetrieveContinentNameByContinentCode(const SourceHook::String Code, SourceHook::String& Name)
 {
@@ -112,12 +103,12 @@ static float GR_RetrieveGeoDistance
 
     if (bImp == true)
     {
-        fEarthRadius = grMeanEarthRadiusMi_;
+        fEarthRadius = grEarthRadiusMi;
     }
 
     else
     {
-        fEarthRadius = grMeanEarthRadiusKm_;
+        fEarthRadius = grEarthRadiusKm;
     }
 
     if (bRad == false)
@@ -869,7 +860,7 @@ static bool GR_DirExists(const char* pszcDirPath)
 
 #else
 
-    ulAttr = GetFileAttributes(pszcDirPath);
+    ulAttr = GetFileAttributesA(pszcDirPath);
 
     if (ulAttr == INVALID_FILE_ATTRIBUTES)
     {
@@ -921,7 +912,7 @@ static bool GR_Startup()
 
     if (MMDB_open(szPath, MMDB_MODE_MMAP, &g_City2Lite) == grGood)
     {
-        Stamp = castValTo_(g_City2Lite.metadata.build_epoch, time_t);
+        Stamp = xTo(g_City2Lite.metadata.build_epoch, time_t);
 
         strftime(szTime, sizeof(szTime), "%F %T UTC", gmtime(&Stamp));
 
@@ -929,7 +920,7 @@ static bool GR_Startup()
 
         g_bCity2Lite = true;
 
-        g_uiDb |= GR_GEO_DB_GEOIP2_CITY_LITE;
+        g_uiDb |= GR_GEO_DB_CITY2_LITE;
     }
 
     else
@@ -938,14 +929,14 @@ static bool GR_Startup()
 
         g_bCity2Lite = false;
 
-        g_uiDb &= ~GR_GEO_DB_GEOIP2_CITY_LITE;
+        g_uiDb &= ~GR_GEO_DB_CITY2_LITE;
     }
 
     g_pSM->BuildPath(Path_SM, szPath, sizeof(szPath), "data/GeoResolver/GeoIP2-City.mmdb");
 
     if (MMDB_open(szPath, MMDB_MODE_MMAP, &g_City2Paid) == grGood)
     {
-        Stamp = castValTo_(g_City2Paid.metadata.build_epoch, time_t);
+        Stamp = xTo(g_City2Paid.metadata.build_epoch, time_t);
 
         strftime(szTime, sizeof(szTime), "%F %T UTC", gmtime(&Stamp));
 
@@ -953,7 +944,7 @@ static bool GR_Startup()
 
         g_bCity2Paid = true;
 
-        g_uiDb |= GR_GEO_DB_GEOIP2_CITY_PAID;
+        g_uiDb |= GR_GEO_DB_CITY2_PAID;
     }
 
     else
@@ -962,7 +953,7 @@ static bool GR_Startup()
 
         g_bCity2Paid = false;
 
-        g_uiDb &= ~GR_GEO_DB_GEOIP2_CITY_PAID;
+        g_uiDb &= ~GR_GEO_DB_CITY2_PAID;
     }
 
     g_pSM->BuildPath(Path_SM, szPath, sizeof(szPath), "data/GeoResolver/GeoLiteCity.dat");
@@ -995,7 +986,7 @@ static bool GR_Startup()
 
         g_bCityLite = true;
 
-        g_uiDb |= GR_GEO_DB_GEOIP_CITY_LITE;
+        g_uiDb |= GR_GEO_DB_CITY_LITE;
     }
 
     else
@@ -1004,7 +995,7 @@ static bool GR_Startup()
 
         g_bCityLite = false;
 
-        g_uiDb &= ~GR_GEO_DB_GEOIP_CITY_LITE;
+        g_uiDb &= ~GR_GEO_DB_CITY_LITE;
     }
 
     g_pSM->BuildPath(Path_SM, szPath, sizeof(szPath), "data/GeoResolver/GeoIPCity.dat");
@@ -1037,7 +1028,7 @@ static bool GR_Startup()
 
         g_bCityPaid = true;
 
-        g_uiDb |= GR_GEO_DB_GEOIP_CITY_PAID;
+        g_uiDb |= GR_GEO_DB_CITY_PAID;
     }
 
     else
@@ -1046,7 +1037,7 @@ static bool GR_Startup()
 
         g_bCityPaid = false;
 
-        g_uiDb &= ~GR_GEO_DB_GEOIP_CITY_PAID;
+        g_uiDb &= ~GR_GEO_DB_CITY_PAID;
     }
 
     g_pSM->BuildPath(Path_SM, szPath, sizeof(szPath), "data/GeoResolver/GeoLiteISP.dat");
@@ -1079,7 +1070,7 @@ static bool GR_Startup()
 
         g_bIspLite = true;
 
-        g_uiDb |= GR_GEO_DB_GEOIP_ISP_LITE;
+        g_uiDb |= GR_GEO_DB_ISP_LITE;
     }
 
     else
@@ -1088,7 +1079,7 @@ static bool GR_Startup()
 
         g_bIspLite = false;
 
-        g_uiDb &= ~GR_GEO_DB_GEOIP_ISP_LITE;
+        g_uiDb &= ~GR_GEO_DB_ISP_LITE;
     }
 
     g_pSM->BuildPath(Path_SM, szPath, sizeof(szPath), "data/GeoResolver/GeoIPISP.dat");
@@ -1121,7 +1112,7 @@ static bool GR_Startup()
 
         g_bIspPaid = true;
 
-        g_uiDb |= GR_GEO_DB_GEOIP_ISP_PAID;
+        g_uiDb |= GR_GEO_DB_ISP_PAID;
     }
 
     else
@@ -1130,7 +1121,7 @@ static bool GR_Startup()
 
         g_bIspPaid = false;
 
-        g_uiDb &= ~GR_GEO_DB_GEOIP_ISP_PAID;
+        g_uiDb &= ~GR_GEO_DB_ISP_PAID;
     }
 
     return true;
@@ -1259,17 +1250,17 @@ static int GeoR_Record(IPluginContext* pCtx, const int* pParams)
     return 1;
 }
 
-static int GeoR_Db(IPluginContext* pCtx, const int* pParams)
+static int GeoR_Db(IPluginContext*, const int*)
 {
-    return castValTo_(g_uiDb, int);
+    return xTo(g_uiDb, int);
 }
 
-static int GeoR_Distance(IPluginContext* pCtx, const int* pParams)
+static int GeoR_Distance(IPluginContext*, const int* pParams)
 {
-    return sp_ftoc(GR_RetrieveGeoDistance(sp_ctof(pParams[1]), sp_ctof(pParams[2]), sp_ctof(pParams[3]), sp_ctof(pParams[4]), castValTo_(pParams[5], bool)));
+    return sp_ftoc(GR_RetrieveGeoDistance(sp_ctof(pParams[1]), sp_ctof(pParams[2]), sp_ctof(pParams[3]), sp_ctof(pParams[4]), xTo(pParams[5], bool)));
 }
 
-static int GeoR_Reload(IPluginContext* pCtx, const int* pParams)
+static int GeoR_Reload(IPluginContext*, const int*)
 {
     static const char* ppszcOldFiles[] =
     {
@@ -1323,9 +1314,9 @@ static int GeoR_Reload(IPluginContext* pCtx, const int* pParams)
     return 1;
 }
 
-static int GeoR_Order(IPluginContext* pCtx, const int* pParams)
+static int GeoR_Order(IPluginContext*, const int* pParams)
 {
-    g_uiOrder = castValTo_(pParams[1], unsigned int);
+    g_uiOrder = xTo(pParams[1], unsigned int);
 
     return 1;
 }
@@ -1354,7 +1345,7 @@ static const sp_nativeinfo_t g_GeoResolverFuncs[] =
     { NULL,                     NULL,           },
 };
 
-bool GeoResolver::SDK_OnLoad(char* pszError, unsigned int uiErrorSize, bool bLateLoaded)
+bool GeoResolver::SDK_OnLoad(char*, unsigned int, bool)
 {
     GR_Startup();
 

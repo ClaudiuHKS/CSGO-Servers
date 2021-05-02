@@ -4,9 +4,9 @@ UpdateLinuxSystem g_UpdateLinuxSystem;
 
 PLUGIN_EXPOSE(UpdateLinuxSystem, g_UpdateLinuxSystem);
 
-bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t maxlen, bool bIsLateLoaded_)
+bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* pszError, unsigned int uiErrorSize, bool)
 {
-    const char* pszGameBaseDir;
+    const char* pszcGameBaseDir;
 
     char szBuffer[2048], szTrimmed[2048];
 
@@ -32,20 +32,20 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
 
     PLUGIN_SAVEVARS();
 
-    if (!(pszGameBaseDir = ismm->GetBaseDir()) || *pszGameBaseDir == '\0')
+    if (!(pszcGameBaseDir = ismm->GetBaseDir()) || *pszcGameBaseDir == '\0')
     {
-        snprintf(error, maxlen, "Failed To Retrieve The Game Base Directory");
+        snprintf(pszError, uiErrorSize, "Failed To Retrieve The Game Base Directory");
 
         return false;
     }
 
-    snprintf(szCfgFile, sizeof(szCfgFile), "%s/addons/update_linux_system/packages.cfg", pszGameBaseDir);
-    snprintf(szLogFile, sizeof(szLogFile), "%s/addons/update_linux_system/status.log", pszGameBaseDir);
+    snprintf(szCfgFile, sizeof(szCfgFile), "%s/addons/update_linux_system/packages.cfg", pszcGameBaseDir);
+    snprintf(szLogFile, sizeof(szLogFile), "%s/addons/update_linux_system/status.log", pszcGameBaseDir);
 
 #if !defined WIN32
 
-    snprintf(szCpuFile, sizeof(szCpuFile), "%s/addons/update_linux_system/cpuinfo.txt", pszGameBaseDir);
-    snprintf(szMemFile, sizeof(szMemFile), "%s/addons/update_linux_system/meminfo.txt", pszGameBaseDir);
+    snprintf(szCpuFile, sizeof(szCpuFile), "%s/addons/update_linux_system/cpuinfo.txt", pszcGameBaseDir);
+    snprintf(szMemFile, sizeof(szMemFile), "%s/addons/update_linux_system/meminfo.txt", pszcGameBaseDir);
 
 #endif
 
@@ -60,7 +60,7 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
 
             fgets(szBuffer, sizeof(szBuffer), pICfgFile);
 
-            for (nIter = 0; nIter < castValTo_(strlen(szBuffer), int); nIter++)
+            for (nIter = 0; nIter < xTo(strlen(szBuffer), int); nIter++)
             {
                 if (szBuffer[nIter] != '\n' && szBuffer[nIter] != '\r')
                 {
@@ -118,7 +118,7 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
 
             if (pOCpuFile)
             {
-                fprintf(pOCpuFile, szBuffer);
+                fputs(szBuffer, pOCpuFile);
 
                 fclose(pOCpuFile);
             }
@@ -145,7 +145,7 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
 
             if (pOMemFile)
             {
-                fprintf(pOMemFile, szBuffer);
+                fputs(szBuffer, pOMemFile);
 
                 fclose(pOMemFile);
             }
@@ -159,7 +159,7 @@ bool UpdateLinuxSystem::Load(PluginId id, ISmmAPI* ismm, char* error, size_t max
     return true;
 }
 
-bool UpdateLinuxSystem::Unload(char* pszError, size_t uErrorMaxLen)
+bool UpdateLinuxSystem::Unload(char*, unsigned int)
 {
     return true;
 }
@@ -169,12 +169,12 @@ void UpdateLinuxSystem::AllPluginsLoaded()
 
 }
 
-bool UpdateLinuxSystem::Pause(char* pszError_, size_t uErrorMaxLen_)
+bool UpdateLinuxSystem::Pause(char*, unsigned int)
 {
     return true;
 }
 
-bool UpdateLinuxSystem::Unpause(char* pszError_, size_t uErrorMaxLen_)
+bool UpdateLinuxSystem::Unpause(char*, unsigned int)
 {
     return true;
 }
@@ -218,3 +218,31 @@ const char* UpdateLinuxSystem::GetURL()
 {
     return "https://hattrick.go.ro/";
 }
+
+#if !defined WIN32
+
+extern "C" void __cxa_pure_virtual(void)
+{
+}
+
+void* operator new(size_t uiMem)
+{
+    return malloc(uiMem);
+}
+
+void* operator new[](size_t uiMem)
+{
+    return malloc(uiMem);
+}
+
+void operator delete(void* pMem)
+{
+    free(pMem);
+}
+
+void operator delete[](void* pMem)
+{
+    free(pMem);
+}
+
+#endif

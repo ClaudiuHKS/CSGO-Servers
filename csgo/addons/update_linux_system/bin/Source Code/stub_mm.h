@@ -2,36 +2,37 @@
 
 #include <ISmmPlugin.h>
 
-#define castValTo_( Value, Type )			( ( Type ) ( Value ) )
+#include <stdio.h>
+#include <stdlib.h>
 
-class UpdateLinuxSystem : public ISmmPlugin /** Load, Unload */
+#if defined WIN32
+
+#include <string.h>
+
+#endif
+
+#define xTo(Var, Type) ((Type)(Var))
+
+class UpdateLinuxSystem : public ISmmPlugin
 {
-
 public:
 
-	bool Load(PluginId, ISmmAPI*, char*, size_t, bool);
-	bool Unload(char*, size_t);
+    bool Load(PluginId, ISmmAPI*, char*, unsigned int, bool);
+    bool Unload(char*, unsigned int);
 
-public:
+    bool Pause(char*, unsigned int);
+    bool Unpause(char*, unsigned int);
 
-	bool Pause(char*, size_t);
-	bool Unpause(char*, size_t);
+    void AllPluginsLoaded();
 
-public:
-
-	void AllPluginsLoaded();
-
-public:
-
-	const char* GetAuthor();
-	const char* GetName();
-	const char* GetDescription();
-	const char* GetURL();
-	const char* GetLicense();
-	const char* GetVersion();
-	const char* GetDate();
-	const char* GetLogTag();
-
+    const char* GetAuthor();
+    const char* GetName();
+    const char* GetDescription();
+    const char* GetURL();
+    const char* GetLicense();
+    const char* GetVersion();
+    const char* GetDate();
+    const char* GetLogTag();
 };
 
 extern UpdateLinuxSystem g_UpdateLinuxSystem;

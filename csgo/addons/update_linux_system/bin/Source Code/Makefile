@@ -1,25 +1,81 @@
 
 CMD += gcc
 OUT += update_linux_system_mm.so
+
+SRC += 
+
 SRC += stub_mm.cpp
 
-LIB += ../hl2sdk-csgo/lib/linux/tier1_i486.a
-LIB += ../hl2sdk-csgo/lib/linux/interfaces_i486.a
+# SRC += detours.cpp
+# SRC += disasm.cpp
+# SRC += modules.cpp
 
-LIB += libvstdlib.so
-LIB += libtier0.so
+# SRC += GeoIP.c
+# SRC += GeoIPCity.c
+
+# SRC += GeoIP_deprecated.c
+
+# SRC += regionName.c
+# SRC += timeZone.c
+
+# SRC += maxminddb.c
+# SRC += data-pool.c
+
+# SRC += pread.c
+
+# SRC += ../sourcemod-master/public/smsdk_ext.cpp
+
+# SRC += extension.cpp
+
+LIB += 
+
+# LIB += ../hl2sdk-csgo/lib/linux/tier1_i486.a
+# LIB += ../hl2sdk-csgo/lib/linux/interfaces_i486.a
+
+# LIB += libvstdlib.so
+# LIB += libtier0.so
+
+DEF += 
 
 DEF += -D_COMPILER_GCC
+DEF += -D_GCC
+DEF += -D_GEOIP_STATIC
+DEF += -D_GEOIPDATADIR=\"\"
+DEF += -D_GNU
+DEF += -D_GNU_C
+DEF += -D_GNU_SOURCE
+DEF += -D_GNUC
 DEF += -D_HAS_EXCEPTIONS=0
 DEF += -D_LINUX
+DEF += -D_META_NO_HL2SDK
+DEF += -D_METAMOD_BUILD
 DEF += -D_NDEBUG
+DEF += -D_PACKAGE_VERSION=\"1.6.0\"
 DEF += -D_POSIX
+DEF += -D_POSIX_SOURCE
+DEF += -D_SOURCE_ENGINE=SE_CSGO
+DEF += -D_SOURCEMOD_BUILD
 DEF += -D_USE_MATH_DEFINES
+
 DEF += -DCOMPILER_GCC
+DEF += -DGCC
+DEF += -DGEOIP_STATIC
+DEF += -DGEOIPDATADIR=\"\"
+DEF += -DGNU
+DEF += -DGNU_C
+DEF += -DGNU_SOURCE
+DEF += -DGNUC
+# DEF += -DHAS_EXCEPTIONS=0
 DEF += -DLINUX
+DEF += -DMETA_NO_HL2SDK
+DEF += -DMETAMOD_BUILD
 DEF += -DNDEBUG
+DEF += -DPACKAGE_VERSION=\"1.6.0\"
 DEF += -DPOSIX
+DEF += -DPOSIX_SOURCE
 DEF += -DSOURCE_ENGINE=SE_CSGO
+DEF += -DSOURCEMOD_BUILD
+DEF += -DUSE_MATH_DEFINES
 
 DEF += -DSE_ALIEN_SWARM=10
 DEF += -DSE_ALIENSWARM=10
@@ -72,13 +128,24 @@ DEF += -DSE_PORTAL_2=11
 DEF += -DSE_PORTAL_TWO=11
 DEF += -DSE_PORTALTWO=11
 
-HDR += -I../hl2sdk-csgo/public/game/server
-HDR += -I../hl2sdk-csgo/public
-HDR += -I../hl2sdk-csgo/public/engine
-HDR += -I../hl2sdk-csgo/public/mathlib
-HDR += -I../hl2sdk-csgo/public/vstdlib
-HDR += -I../hl2sdk-csgo/public/tier0
-HDR += -I../hl2sdk-csgo/public/tier1
+HDR += 
+
+# HDR += -I.
+
+# HDR += -I../hl2sdk-csgo/public/game/server
+# HDR += -I../hl2sdk-csgo/public
+# HDR += -I../hl2sdk-csgo/public/engine
+# HDR += -I../hl2sdk-csgo/public/mathlib
+# HDR += -I../hl2sdk-csgo/public/vstdlib
+# HDR += -I../hl2sdk-csgo/public/tier0
+# HDR += -I../hl2sdk-csgo/public/tier1
+
+# HDR += -I../amtl-master
+# HDR += -I../amtl-master/amtl
+
+# HDR += -I../sourcepawn-master/include
+
+# HDR += -I../sourcemod-master/public
 
 HDR += -I../metamod-source-master/core
 HDR += -I../metamod-source-master/core/sourcehook
@@ -87,21 +154,28 @@ OPT += -fno-exceptions
 OPT += -fno-rtti
 OPT += -fno-strict-aliasing
 OPT += -fno-threadsafe-statics
-OPT += -fomit-frame-pointer
-OPT += -funroll-loops
 OPT += -fvisibility-inlines-hidden
 OPT += -fvisibility=hidden
-OPT += -ldl
-OPT += -lm
-OPT += -lpthread
-OPT += -lstdc++
+
+# OPT += -lstdc++
+
 OPT += -m32
+OPT += -mfpmath=sse
+OPT += -msse
+
 OPT += -o3
+
 OPT += -pipe
+
 OPT += -s
 OPT += -shared
 OPT += -static-libgcc
+
+OPT += -std=c++11
+# OPT += -std=c++14
+
 OPT += -std=c11
+
 OPT += -w
 
 default:

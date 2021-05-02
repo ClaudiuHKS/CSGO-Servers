@@ -51,7 +51,7 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_HAS_EXCEPTIONS=0;_USE_MATH_DEFINES;COMPILER_MSVC;COMPILER_MSVC32;COMPILER_MSVC_32;COMPILER_MSVC86;COMPILER_MSVC_86;COMPILER_MSVCX86;COMPILER_MSVC_X86;SOURCE_ENGINE=SE_CSGO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>META_NO_HL2SDK;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;SOURCEMOD_BUILD;WIN32;NDEBUG;_HAS_EXCEPTIONS=0;_USE_MATH_DEFINES;COMPILER_MSVC;COMPILER_MSVC32;COMPILER_MSVC_32;COMPILER_MSVC86;COMPILER_MSVC_86;COMPILER_MSVCX86;COMPILER_MSVC_X86;SOURCE_ENGINE=SE_CSGO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <DebugInformationFormat>None</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -80,7 +80,7 @@
       <UseStandardPreprocessor>false</UseStandardPreprocessor>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <GuardEHContMetadata>false</GuardEHContMetadata>
-      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableModules>true</EnableModules>
       <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
@@ -88,7 +88,7 @@
       <ProgramDataBaseFileName />
       <UseFullPaths>false</UseFullPaths>
       <ErrorReporting>None</ErrorReporting>
-      <AdditionalIncludeDirectories>$(MMSOURCE19)\core;$(MMSOURCE19)\core\sourcehook;$(HL2SDKCSGO)\public;$(HL2SDKCSGO)\public\engine;$(HL2SDKCSGO)\public\game\server;$(HL2SDKCSGO)\public\tier0;$(HL2SDKCSGO)\public\tier1;$(HL2SDKCSGO)\public\mathlib;$(HL2SDKCSGO)\public\vstdlib;$(MYSQL)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MMSOURCE19)\core;$(MMSOURCE19)\core\sourcehook;$(MYSQL)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -99,7 +99,7 @@
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>$(HL2SDKCSGO)\lib\public\interfaces.lib;$(HL2SDKCSGO)\lib\public\tier0.lib;$(HL2SDKCSGO)\lib\public\tier1.lib;$(HL2SDKCSGO)\lib\public\vstdlib.lib;SHELL32.LIB;OLE32.LIB;LEGACY_STDIO_DEFINITIONS.LIB;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/EMITPOGOPHASEINFO %(AdditionalOptions)</AdditionalOptions>
       <LinkStatus>false</LinkStatus>
       <PreventDllBinding>true</PreventDllBinding>
@@ -116,9 +116,10 @@
       <CLRSupportLastError>Disabled</CLRSupportLastError>
       <CETCompat>true</CETCompat>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(MYSQL)\lib\vs14</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(HL2SDKCSGO)\lib\public;$(MYSQL)\lib\vs14</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
+      <FixedBaseAddress>false</FixedBaseAddress>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
