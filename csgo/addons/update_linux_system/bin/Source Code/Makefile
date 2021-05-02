@@ -4,6 +4,9 @@ OUT += update_linux_system_mm.so
 
 SRC += 
 
+# SRC += hack_Stat.c
+# SRC += hack_Fstat.c
+
 SRC += stub_mm.cpp
 
 # SRC += detours.cpp
@@ -152,10 +155,16 @@ HDR += -I../metamod-source-master/core/sourcehook
 
 OPT += -fno-exceptions
 OPT += -fno-rtti
+OPT += -fno-stack-protector
 OPT += -fno-strict-aliasing
 OPT += -fno-threadsafe-statics
+
 OPT += -fvisibility-inlines-hidden
 OPT += -fvisibility=hidden
+
+OPT += -ldl
+OPT += -lm
+OPT += -lpthread
 
 # OPT += -lstdc++
 
@@ -175,8 +184,12 @@ OPT += -std=c++11
 # OPT += -std=c++14
 
 OPT += -std=c11
+# OPT += -std=c17
 
 OPT += -w
+
+# OPT += -Wl,--wrap=stat
+# OPT += -Wl,--wrap=fstat
 
 default:
 
