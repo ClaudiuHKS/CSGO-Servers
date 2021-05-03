@@ -62,7 +62,7 @@ public void OnMapStart()
         {
             IntToString(_BOT_QUOTA_,                szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hBotQuota,            szBuffer, true);
+            SetConVarString(g_hBotQuota,            szBuffer, true, true);
         }
 
         if (!g_bQuotaConVarChangeHooked)
@@ -76,7 +76,7 @@ public void OnMapStart()
         {
             IntToString(_BOT_QUOTA_,                szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hBotQuota,            szBuffer, true);
+            SetConVarString(g_hBotQuota,            szBuffer, true, true);
         }
     }
 }
@@ -114,7 +114,7 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
         {
             IntToString(_BOT_QUOTA_,        szBuffer, sizeof (szBuffer));
 
-            SetConVarString(hConVar,        szBuffer, true);
+            SetConVarString(hConVar,        szBuffer, true, true);
         }
     }
 }

@@ -108,7 +108,7 @@ public void OnConfigsExecuted()
 
     if (hTags != null)
     {
-        hTags.SetString(szTags,         true);
+        hTags.SetString(szTags,         true, true);
     }
 }
 
@@ -163,7 +163,7 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
 
             if (strcmp(szNew, szBuffer))
             {
-                SetConVarString(hConVar, szBuffer, true);
+                SetConVarString(hConVar, szBuffer, true, true);
             }
         }
     }

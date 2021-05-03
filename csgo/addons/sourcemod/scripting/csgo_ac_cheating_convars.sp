@@ -134,7 +134,7 @@ public void OnConfigsExecuted()
 {
     if (g_hConVarPluginVersion != INVALID_HANDLE)
     {
-        SetConVarString(g_hConVarPluginVersion, CSGOACCC_VERSION, true); // Update The Version's ConVar
+        SetConVarString(g_hConVarPluginVersion, CSGOACCC_VERSION, true, true); // Update The Version's ConVar
     }
 }
 

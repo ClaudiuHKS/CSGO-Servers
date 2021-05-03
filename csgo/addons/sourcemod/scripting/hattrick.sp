@@ -531,7 +531,7 @@ public void OnMapStart()
         {
             IntToString(_BOT_QUOTA_,                szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hBotQuota,            szBuffer, true);
+            SetConVarString(g_hBotQuota,            szBuffer, true, true);
         }
 
         if (!g_bQuotaConVarChangeHooked)
@@ -545,7 +545,7 @@ public void OnMapStart()
         {
             IntToString(_BOT_QUOTA_,                szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hBotQuota,            szBuffer, true);
+            SetConVarString(g_hBotQuota,            szBuffer, true, true);
         }
     }
 
@@ -555,7 +555,7 @@ public void OnMapStart()
         {
             IntToString(_SV_FULL_ALLTALK_,          szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hSvFullAllTalk,       szBuffer, true);
+            SetConVarString(g_hSvFullAllTalk,       szBuffer, true, true);
         }
 
         if (!g_bAllTalkConVarChangeHooked)
@@ -569,7 +569,7 @@ public void OnMapStart()
         {
             IntToString(_SV_FULL_ALLTALK_,          szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hSvFullAllTalk,       szBuffer, true);
+            SetConVarString(g_hSvFullAllTalk,       szBuffer, true, true);
         }
     }
 
@@ -579,7 +579,7 @@ public void OnMapStart()
         {
             IntToString(_SUICIDE_SCORE_,            szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hSuicideScore,        szBuffer, true);
+            SetConVarString(g_hSuicideScore,        szBuffer, true, true);
         }
 
         if (!g_bSScoreConVarChangeHooked)
@@ -593,7 +593,7 @@ public void OnMapStart()
         {
             IntToString(_SUICIDE_SCORE_,            szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hSuicideScore,        szBuffer, true);
+            SetConVarString(g_hSuicideScore,        szBuffer, true, true);
         }
     }
 
@@ -603,7 +603,7 @@ public void OnMapStart()
         {
             IntToString(_SUICIDE_PENALTY_,          szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hSuicidePenalty,      szBuffer, true);
+            SetConVarString(g_hSuicidePenalty,      szBuffer, true, true);
         }
 
         if (!g_bSPenConVarChangeHooked)
@@ -617,7 +617,7 @@ public void OnMapStart()
         {
             IntToString(_SUICIDE_PENALTY_,          szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hSuicidePenalty,      szBuffer, true);
+            SetConVarString(g_hSuicidePenalty,      szBuffer, true, true);
         }
     }
 
@@ -813,12 +813,12 @@ public void OnConfigsExecuted()
 
     if (hHostName != null)
     {
-        hHostName.SetString(szHostName, true);
+        hHostName.SetString(szHostName, true, true);
     }
 
     if (hTags != null)
     {
-        hTags.SetString(szTags,         true);
+        hTags.SetString(szTags,         true, true);
     }
 }
 
@@ -1206,7 +1206,7 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
         {
             IntToString(_BOT_QUOTA_,        szBuffer, sizeof (szBuffer));
 
-            SetConVarString(hConVar,        szBuffer, true);
+            SetConVarString(hConVar,        szBuffer, true, true);
         }
     }
 
@@ -1216,7 +1216,7 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
         {
             IntToString(_SV_FULL_ALLTALK_,  szBuffer, sizeof (szBuffer));
 
-            SetConVarString(hConVar,        szBuffer, true);
+            SetConVarString(hConVar,        szBuffer, true, true);
         }
     }
 
@@ -1226,7 +1226,7 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
         {
             IntToString(_SUICIDE_SCORE_,    szBuffer, sizeof (szBuffer));
 
-            SetConVarString(hConVar,        szBuffer, true);
+            SetConVarString(hConVar,        szBuffer, true, true);
         }
     }
 
@@ -1236,7 +1236,7 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
         {
             IntToString(_SUICIDE_PENALTY_,  szBuffer, sizeof (szBuffer));
 
-            SetConVarString(hConVar,        szBuffer, true);
+            SetConVarString(hConVar,        szBuffer, true, true);
         }
     }
 
@@ -1257,7 +1257,7 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
 
             if (strcmp(szNew, szBuffer))
             {
-                SetConVarString(hConVar, szBuffer, true);
+                SetConVarString(hConVar, szBuffer, true, true);
             }
         }
     }
@@ -1279,7 +1279,7 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
 
             if (strcmp(szNew, szBuffer))
             {
-                SetConVarString(hConVar, szBuffer, true);
+                SetConVarString(hConVar, szBuffer, true, true);
             }
         }
     }
@@ -1598,7 +1598,7 @@ public Action _SM_CVar_(int nClient, int nArgs)
 
     GetCmdArg(2, szConVarVal, sizeof (szConVarVal));
 
-    hConVar.SetString(szConVarVal, true);
+    hConVar.SetString(szConVarVal, true, true);
 
     switch (nClient)
     {

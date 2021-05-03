@@ -140,7 +140,7 @@ public void OnMapStart()
         {
             IntToString(_SUICIDE_SCORE_,            szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hSuicideScore,        szBuffer, true);
+            SetConVarString(g_hSuicideScore,        szBuffer, true, true);
         }
 
         if (!g_bSScoreConVarChangeHooked)
@@ -154,7 +154,7 @@ public void OnMapStart()
         {
             IntToString(_SUICIDE_SCORE_,            szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hSuicideScore,        szBuffer, true);
+            SetConVarString(g_hSuicideScore,        szBuffer, true, true);
         }
     }
 
@@ -164,7 +164,7 @@ public void OnMapStart()
         {
             IntToString(_SUICIDE_PENALTY_,          szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hSuicidePenalty,      szBuffer, true);
+            SetConVarString(g_hSuicidePenalty,      szBuffer, true, true);
         }
 
         if (!g_bSPenConVarChangeHooked)
@@ -178,7 +178,7 @@ public void OnMapStart()
         {
             IntToString(_SUICIDE_PENALTY_,          szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hSuicidePenalty,      szBuffer, true);
+            SetConVarString(g_hSuicidePenalty,      szBuffer, true, true);
         }
     }
 }
@@ -305,7 +305,7 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
         {
             IntToString(_SUICIDE_SCORE_,    szBuffer, sizeof (szBuffer));
 
-            SetConVarString(hConVar,        szBuffer, true);
+            SetConVarString(hConVar,        szBuffer, true, true);
         }
     }
 
@@ -315,7 +315,7 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
         {
             IntToString(_SUICIDE_PENALTY_,  szBuffer, sizeof (szBuffer));
 
-            SetConVarString(hConVar,        szBuffer, true);
+            SetConVarString(hConVar,        szBuffer, true, true);
         }
     }
 }

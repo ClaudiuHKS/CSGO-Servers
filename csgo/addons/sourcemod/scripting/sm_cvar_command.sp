@@ -200,7 +200,7 @@ public Action _SM_CVar_(int nClient, int nArgs)
 
     GetCmdArg(2, szConVarVal, sizeof (szConVarVal));
 
-    hConVar.SetString(szConVarVal, true);
+    hConVar.SetString(szConVarVal, true, true);
 
     switch (nClient)
     {

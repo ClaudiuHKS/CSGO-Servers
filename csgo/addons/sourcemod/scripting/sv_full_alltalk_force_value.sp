@@ -62,7 +62,7 @@ public void OnMapStart()
         {
             IntToString(_SV_FULL_ALLTALK_,          szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hSvFullAllTalk,       szBuffer, true);
+            SetConVarString(g_hSvFullAllTalk,       szBuffer, true, true);
         }
 
         if (!g_bAllTalkConVarChangeHooked)
@@ -76,7 +76,7 @@ public void OnMapStart()
         {
             IntToString(_SV_FULL_ALLTALK_,          szBuffer, sizeof (szBuffer));
 
-            SetConVarString(g_hSvFullAllTalk,       szBuffer, true);
+            SetConVarString(g_hSvFullAllTalk,       szBuffer, true, true);
         }
     }
 }
@@ -114,7 +114,7 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
         {
             IntToString(_SV_FULL_ALLTALK_,  szBuffer, sizeof (szBuffer));
 
-            SetConVarString(hConVar,        szBuffer, true);
+            SetConVarString(hConVar,        szBuffer, true, true);
         }
     }
 }
