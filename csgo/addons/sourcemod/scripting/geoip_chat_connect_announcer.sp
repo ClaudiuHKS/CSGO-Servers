@@ -19,7 +19,7 @@ public Plugin myinfo =
  * COMMENT      + '//'      IF NO
  */
 
-// #define  SHOW_EVEN_IF_NOT_DETECTED
+#define     SHOW_EVEN_IF_NOT_DETECTED
 
 #define     SHOW_PLAYER_DISCONNECT_CHAT     /// Show?
 #define     SHOW_PLAYER_TEAM_CHAT           /// Show?
@@ -392,7 +392,7 @@ public Action Timer_Left(Handle hTimer,         any hPack)
 
             TrimString(szNewReason);
 
-            PrintToChatAll(" \x01Player\x05 %s\x01 left,\x09 %s\x01.", szName, szReason);
+            PrintToChatAll(" \x01Player\x05 %s\x01 left,\x09 %s\x01.", szName, szNewReason);
 
             g_fStamp = fEngTime + CHAT_SPAM_DELAY;
         }
