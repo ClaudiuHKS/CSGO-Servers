@@ -235,7 +235,7 @@ public void OnPlrDisconnect_Pre(Handle hEv, const char[]    szEvName,   bool bEv
                     WritePackString(hPack, szName);
                     WritePackString(hPack, szReason);
 
-                    CreateTimer(GetRandomFloat(0.100000, 1.000000), Timer_Left, hPack, TIMER_FLAG_NO_MAPCHANGE | TIMER_DATA_HNDL_CLOSE);
+                    CreateTimer(GetRandomFloat(0.100000, 1.500000), Timer_Left, hPack, TIMER_FLAG_NO_MAPCHANGE | TIMER_DATA_HNDL_CLOSE);
                 }
             }
         }
@@ -281,7 +281,7 @@ public void OnPlrTeam_Pre(Handle hEv, const char[]    szEvName,   bool bEvNoBC)
                     WritePackCell(hPack, nClientUserId);
                     WritePackCell(hPack, nTeam);
 
-                    CreateTimer(GetRandomFloat(0.100000, 1.000000), Timer_TeamJoin, hPack, TIMER_FLAG_NO_MAPCHANGE | TIMER_DATA_HNDL_CLOSE);
+                    CreateTimer(GetRandomFloat(0.100000, 1.500000), Timer_TeamJoin, hPack, TIMER_FLAG_NO_MAPCHANGE | TIMER_DATA_HNDL_CLOSE);
                 }
             }
         }
