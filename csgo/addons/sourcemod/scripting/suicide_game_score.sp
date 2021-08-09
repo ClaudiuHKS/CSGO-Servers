@@ -225,7 +225,7 @@ public void OnPluginEnd()
 
 public void _Player_Death_(Event hEv, const char[] szName, bool bNoBC)
 {
-    static int nKiller = 0, nEntity = 0, nVictim = 0, m_bIsControllingBot = 0, m_iControlledBotEntIndex = 0;
+    static int nKiller = 0, nEntity = 0, nVictim = 0, nPlayer = 0, m_bIsControllingBot = 0, m_iControlledBotEntIndex = 0;
 
     if
     (
@@ -262,18 +262,21 @@ public void _Player_Death_(Event hEv, const char[] szName, bool bNoBC)
         )
     )
     {
-        _PREP_OFFS_(nEntity,        m_bIsControllingBot,        "m_bIsControllingBot");
+        _PREP_OFFS_(nEntity,            m_bIsControllingBot,        "m_bIsControllingBot");
 
-        if (GetEntData(nEntity,     m_bIsControllingBot,        1) > 0)
+        if (GetEntData(nEntity,         m_bIsControllingBot,        1) > 0)
         {
-            _PREP_OFFS_(nEntity,    m_iControlledBotEntIndex,   "m_iControlledBotEntIndex");
+            _PREP_OFFS_(nEntity,        m_iControlledBotEntIndex,   "m_iControlledBotEntIndex");
 
-            CreateTimer(0.000001,   _Timer_Decrease_Deaths_,    GetClientUserId(GetEntData(nEntity, m_iControlledBotEntIndex)), TIMER_FLAG_NO_MAPCHANGE);
+            if ((nPlayer =              GetEntData(nEntity,         m_iControlledBotEntIndex)) > 0 && IsClientConnected(nPlayer)    && IsClientInGame(nPlayer))
+            {
+                CreateTimer(0.000001,   _Timer_Decrease_Deaths_,    GetClientUserId(nPlayer),                                       TIMER_FLAG_NO_MAPCHANGE);
+            }
         }
 
         else
         {
-            CreateTimer(0.000001,   _Timer_Decrease_Deaths_,    GetClientUserId(nEntity),                                       TIMER_FLAG_NO_MAPCHANGE);
+            CreateTimer(0.000001,       _Timer_Decrease_Deaths_,    GetClientUserId(nEntity),                                       TIMER_FLAG_NO_MAPCHANGE);
         }
     }
 }
