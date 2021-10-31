@@ -182,10 +182,14 @@ forward void OnPluginPauseChange(bool pause);
 forward void OnGameFrame();
 
 /**
- * Called when the map is loaded.
+ * Called when the map starts loading.
  *
- * @note This used to be OnServerLoad(), which is now deprecated.
- *       Plugins still using the old forward will work.
+ * @param mapName Name of the map
+ */
+forward void OnMapInit(const char[] mapName);
+
+/**
+ * Called when the map is loaded.
  */
 forward void OnMapStart();
 
@@ -496,6 +500,13 @@ forward void OnLibraryAdded(const char[] name);
  */
 forward void OnLibraryRemoved(const char[] name);
 
+/**
+ * Called when a plugin unloaded.
+ *
+ * @param plugin        Plugin Handle who unloaded.
+ */
+forward void OnNotifyPluginUnloaded(Handle plugin);
+
 #define MAPLIST_FLAG_MAPSFOLDER    (1<<0)    /**< On failure, use all maps in the maps folder. */
 #define MAPLIST_FLAG_CLEARARRAY    (1<<1)    /**< If an input array is specified, clear it before adding. */
 #define MAPLIST_FLAG_NO_DEFAULT    (1<<2)    /**< Do not read "default" or "mapcyclefile" on failure. */
@@ -684,18 +695,22 @@ enum Address
  * @param size          How many bytes should be read.
  *                      If loading a floating-point value, use NumberType_Int32.
  * @return              The value that is stored at that address.
+ * @error               Address is null or pointing to reserved memory.
  */
 native any LoadFromAddress(Address addr, NumberType size);
 
 /**
  * Store up to 4 bytes to a memory address.
  *
- * @param addr          Address to a memory location.
- * @param data          Value to store at the address.
- * @param size          How many bytes should be written.
- *                      If storing a floating-point value, use NumberType_Int32.
+ * @param addr                     Address to a memory location.
+ * @param data                     Value to store at the address.
+ * @param size                     How many bytes should be written.
+ *                                 If storing a floating-point value, use NumberType_Int32.
+ * @param updateMemAccess          If true, SourceMod will set read / write / exec permissions
+ *                                 on the memory page being written to.
+ * @error                          Address is null or pointing to reserved memory.
  */
-native void StoreToAddress(Address addr, any data, NumberType size);
+native void StoreToAddress(Address addr, any data, NumberType size, bool updateMemAccess = true);
 
 methodmap FrameIterator < Handle {
 	// Creates a stack frame iterator to build your own stack traces.
