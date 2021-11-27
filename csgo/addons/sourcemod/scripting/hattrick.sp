@@ -1477,20 +1477,28 @@ public Action _Timer_Vote_Change_Map_(Handle hTimer, any nId)
 
 public Action _Timer_Ragdoll_Velocity_(Handle hTimer, any nEntity)
 {
-    static int m_vecForce = 0, m_vecRagdollVelocity = 0;
-    static float fForce[3] = { 0.0, ... }, fRagdollVelocity[3] = { 0.0, ... };
+    static int m_vecVelocity = 0, m_vecAbsVelocity = 0, m_vecForce = 0, m_vecRagdollVelocity = 0;
+    static float fVelocity[3] = { 0.0, ... }, fAbsVelocity[3] = { 0.0, ... }, fForce[3] = { 0.0, ... }, fRagdollVelocity[3] = { 0.0, ... };
 
     if (IsValidEntity(nEntity))
     {
+        _PREP_OFFS_(nEntity, m_vecVelocity,             "m_vecVelocity");
+        _PREP_OFFS_(nEntity, m_vecAbsVelocity,          "m_vecAbsVelocity");
         _PREP_OFFS_(nEntity, m_vecForce,                "m_vecForce");
         _PREP_OFFS_(nEntity, m_vecRagdollVelocity,      "m_vecRagdollVelocity");
 
+        GetEntDataVector(nEntity, m_vecVelocity,        fVelocity);
+        GetEntDataVector(nEntity, m_vecAbsVelocity,     fAbsVelocity);
         GetEntDataVector(nEntity, m_vecForce,           fForce);
         GetEntDataVector(nEntity, m_vecRagdollVelocity, fRagdollVelocity);
 
+        ScaleVector(fVelocity,                          2048.0);
+        ScaleVector(fAbsVelocity,                       2048.0);
         ScaleVector(fForce,                             2048.0);
         ScaleVector(fRagdollVelocity,                   2048.0);
 
+        SetEntDataVector(nEntity, m_vecVelocity,        fVelocity, true);
+        SetEntDataVector(nEntity, m_vecAbsVelocity,     fAbsVelocity, true);
         SetEntDataVector(nEntity, m_vecForce, fForce,   true);
         SetEntDataVector(nEntity, m_vecRagdollVelocity, fRagdollVelocity, true);
     }
