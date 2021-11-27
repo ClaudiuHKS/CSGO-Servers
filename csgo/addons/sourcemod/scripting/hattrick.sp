@@ -105,11 +105,11 @@ static float g_fRateMsgTimeStamp =              0.0;
  * CUSTOM PRIVATE FUNCTIONS
  */
 
-static bool _Create_Dir_(const char[] szDirPath, const int nCombinations = 8192)
+static bool _Create_Dir_(const char[] szDirPath, const int nFlags = 511)
 {
     static int nIter = 0;
 
-    for (nIter = 0; nIter < nCombinations; nIter++)
+    for (nIter = nFlags; nIter != -1; nIter--)
     {
         if (CreateDirectory(szDirPath, nIter))
         {
