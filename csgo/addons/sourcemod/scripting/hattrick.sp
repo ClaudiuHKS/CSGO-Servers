@@ -105,7 +105,10 @@ static float g_fRateMsgTimeStamp =              0.0;
  * CUSTOM PRIVATE FUNCTIONS
  */
 
-static bool _Create_Dir_(const char[] szDirPath, const int nFlags = 511)
+static bool _Create_Dir_(const char[] szDirPath, const int nFlags = \
+    ((FPERM_U_READ | FPERM_U_WRITE | FPERM_U_EXEC) | \
+    (FPERM_G_READ | FPERM_G_WRITE | FPERM_G_EXEC) | \
+    (FPERM_O_READ | FPERM_O_WRITE | FPERM_O_EXEC)))
 {
     static int nIter = 0;
 
