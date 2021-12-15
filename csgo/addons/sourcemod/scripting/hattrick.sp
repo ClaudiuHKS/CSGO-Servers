@@ -79,6 +79,7 @@ static Handle g_hHostName =                     INVALID_HANDLE;
 static Handle g_hSvTags =                       INVALID_HANDLE;
 static Handle g_hSuicideScore =                 INVALID_HANDLE;
 static Handle g_hSuicidePenalty =               INVALID_HANDLE;
+static Handle g_hMpRestartGame =                INVALID_HANDLE;
 
 static int g_nPatchSize =                       -1;
 static int g_nPatchOffs =                       -1;
@@ -360,7 +361,11 @@ static int _CVar_Flags_Str_(ConVar& hConVar, char[] szStr, int nMaxLen)
 
             ReplaceStringEx(szStr, nMaxLen, ", $", "", 3, 0, true);
         }
+
+        return nFlagsNum;
     }
+
+    return 0;
 }
 
 static int _Get_Sv_Tick_Rate_()
@@ -496,6 +501,11 @@ public void OnMapStart()
         HookEventEx("player_team",                  _Player_Team_);
 
         g_bPlayerTeamHooked =                       true;
+    }
+
+    if (g_hMpRestartGame == INVALID_HANDLE)
+    {
+        g_hMpRestartGame =                          FindConVar("mp_restartgame");
     }
 
     if (g_hBotQuota == INVALID_HANDLE)
@@ -822,6 +832,14 @@ public void OnConfigsExecuted()
     if (hTags != null)
     {
         hTags.SetString(szTags,         true, true);
+    }
+
+    if (g_hMpRestartGame != INVALID_HANDLE)
+    {
+        if (g_hBotQuota != INVALID_HANDLE)
+        {
+            CreateTimer(1.000000, _Timer_FakePlayers_Status_, INVALID_HANDLE, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+        }
     }
 }
 
@@ -1414,6 +1432,59 @@ public Action _Timer_Decrease_Deaths_(Handle hTimer, any nId)
         if (nDeaths > 0)
         {
             SetEntData(nEntity, m_iDeaths,          nDeaths - 1);
+        }
+    }
+}
+
+public Action _Timer_FakePlayers_Status_(Handle hTimer, any hData)
+{
+    static int nQuota = 0, nPlayer = 0, nHumans = 0, nFakePlayers = 0;
+
+    nQuota = GetConVarInt(g_hBotQuota);
+
+    if (nQuota > 0)
+    {
+        if (GetConVarInt(g_hMpRestartGame) == 0)
+        {
+            for (nPlayer = 1, nHumans = 0, nFakePlayers = 0; nPlayer <= MaxClients; nPlayer++)
+            {
+                if (IsClientConnected(nPlayer) && IsClientInGame(nPlayer))
+                {
+                    if (IsClientSourceTV(nPlayer) || IsClientReplay(nPlayer))
+                    {
+                        continue;
+                    }
+
+                    if (IsClientInKickQueue(nPlayer))
+                    {
+                        continue;
+                    }
+
+                    switch (IsFakeClient(nPlayer))
+                    {
+                        case false:
+                        {
+                            if (!IsClientTimingOut(nPlayer))
+                            {
+                                nHumans++;
+                            }
+                        }
+
+                        default:
+                        {
+                            nFakePlayers++;
+                        }
+                    }
+                }
+            }
+
+            if (nHumans < nQuota)
+            {
+                if (nFakePlayers < nQuota)
+                {
+                    SetConVarInt(g_hMpRestartGame, 1, true, true);
+                }
+            }
         }
     }
 }

@@ -34,6 +34,7 @@ public Plugin myinfo =
  */
 
 static Handle g_hBotQuota =                 INVALID_HANDLE;
+static Handle g_hMpRestartGame =            INVALID_HANDLE;
 
 static bool g_bQuotaConVarChangeHooked =    false;
 
@@ -50,6 +51,11 @@ public void OnPluginStart()
 public void OnMapStart()
 {
     static char szBuffer[PLATFORM_MAX_PATH] =       { 0, ... };
+
+    if (g_hMpRestartGame == INVALID_HANDLE)
+    {
+        g_hMpRestartGame =                          FindConVar("mp_restartgame");
+    }
 
     if (g_hBotQuota == INVALID_HANDLE)
     {
@@ -77,6 +83,17 @@ public void OnMapStart()
             IntToString(_BOT_QUOTA_,                szBuffer, sizeof (szBuffer));
 
             SetConVarString(g_hBotQuota,            szBuffer, true, true);
+        }
+    }
+}
+
+public void OnConfigsExecuted()
+{
+    if (g_hMpRestartGame != INVALID_HANDLE)
+    {
+        if (g_hBotQuota != INVALID_HANDLE)
+        {
+            CreateTimer(1.000000, _Timer_FakePlayers_Status_, INVALID_HANDLE, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
         }
     }
 }
@@ -115,6 +132,59 @@ public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] sz
             IntToString(_BOT_QUOTA_,        szBuffer, sizeof (szBuffer));
 
             SetConVarString(hConVar,        szBuffer, true, true);
+        }
+    }
+}
+
+public Action _Timer_FakePlayers_Status_(Handle hTimer, any hData)
+{
+    static int nQuota = 0, nPlayer = 0, nHumans = 0, nFakePlayers = 0;
+
+    nQuota = GetConVarInt(g_hBotQuota);
+
+    if (nQuota > 0)
+    {
+        if (GetConVarInt(g_hMpRestartGame) == 0)
+        {
+            for (nPlayer = 1, nHumans = 0, nFakePlayers = 0; nPlayer <= MaxClients; nPlayer++)
+            {
+                if (IsClientConnected(nPlayer) && IsClientInGame(nPlayer))
+                {
+                    if (IsClientSourceTV(nPlayer) || IsClientReplay(nPlayer))
+                    {
+                        continue;
+                    }
+
+                    if (IsClientInKickQueue(nPlayer))
+                    {
+                        continue;
+                    }
+
+                    switch (IsFakeClient(nPlayer))
+                    {
+                        case false:
+                        {
+                            if (!IsClientTimingOut(nPlayer))
+                            {
+                                nHumans++;
+                            }
+                        }
+
+                        default:
+                        {
+                            nFakePlayers++;
+                        }
+                    }
+                }
+            }
+
+            if (nHumans < nQuota)
+            {
+                if (nFakePlayers < nQuota)
+                {
+                    SetConVarInt(g_hMpRestartGame, 1, true, true);
+                }
+            }
         }
     }
 }

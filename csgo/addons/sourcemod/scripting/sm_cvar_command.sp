@@ -85,7 +85,11 @@ static int _CVar_Flags_Str_(ConVar& hConVar, char[] szStr, int nMaxLen)
 
             ReplaceStringEx(szStr, nMaxLen, ", $", "", 3, 0, true);
         }
+
+        return nFlagsNum;
     }
+
+    return 0;
 }
 
 
