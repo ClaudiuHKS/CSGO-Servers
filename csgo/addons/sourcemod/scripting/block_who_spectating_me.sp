@@ -50,24 +50,24 @@ public void OnPluginEnd()
         }
     }
 
+    UnhookEvent("player_spawn", OnPlayerStateChanged_Pre, EventHookMode_Pre);
+    UnhookEvent("player_death", OnPlayerStateChanged_Pre, EventHookMode_Pre);
+    UnhookEvent("player_team",  OnPlayerStateChanged_Pre, EventHookMode_Pre);
+
     UnhookEvent("player_spawn", OnPlayerStateChanged, EventHookMode_Post);
     UnhookEvent("player_death", OnPlayerStateChanged, EventHookMode_Post);
     UnhookEvent("player_team",  OnPlayerStateChanged, EventHookMode_Post);
-
-    UnhookEvent("player_spawn", OnPlayerStateChanged, EventHookMode_Pre);
-    UnhookEvent("player_death", OnPlayerStateChanged, EventHookMode_Pre);
-    UnhookEvent("player_team",  OnPlayerStateChanged, EventHookMode_Pre);
 }
 
 public void OnPluginStart()
 {
+    HookEventEx("player_spawn", OnPlayerStateChanged_Pre, EventHookMode_Pre);
+    HookEventEx("player_death", OnPlayerStateChanged_Pre, EventHookMode_Pre);
+    HookEventEx("player_team",  OnPlayerStateChanged_Pre, EventHookMode_Pre);
+
     HookEventEx("player_spawn", OnPlayerStateChanged, EventHookMode_Post);
     HookEventEx("player_death", OnPlayerStateChanged, EventHookMode_Post);
     HookEventEx("player_team",  OnPlayerStateChanged, EventHookMode_Post);
-
-    HookEventEx("player_spawn", OnPlayerStateChanged, EventHookMode_Pre);
-    HookEventEx("player_death", OnPlayerStateChanged, EventHookMode_Pre);
-    HookEventEx("player_team",  OnPlayerStateChanged, EventHookMode_Pre);
 
     for (int nClient = 1; nClient <= MaxClients; nClient++)
     {
@@ -80,11 +80,33 @@ public void OnPluginStart()
     }
 }
 
-public Action OnPlayerStateChanged(Event hEv, const char[] szEvName, bool bEvNoBC)
+public void OnPlayerStateChanged_Pre(Event hEv, const char[] szEvName, bool bEvNoBC)
 {
+    static int nUserId = 0;
+
     if (hEv != null)
     {
-        CreateTimer(0.000001, Timer_PlayerStateChanged, hEv.GetInt("userid"), TIMER_FLAG_NO_MAPCHANGE);
+        nUserId = hEv.GetInt("userid", 0);
+
+        if (nUserId > 0)
+        {
+            CreateTimer(0.000001, Timer_PlayerStateChanged, nUserId, TIMER_FLAG_NO_MAPCHANGE);
+        }
+    }
+}
+
+public void OnPlayerStateChanged(Event hEv, const char[] szEvName, bool bEvNoBC)
+{
+    static int nUserId = 0;
+
+    if (hEv != null)
+    {
+        nUserId = hEv.GetInt("userid", 0);
+
+        if (nUserId > 0)
+        {
+            CreateTimer(0.000001, Timer_PlayerStateChanged, nUserId, TIMER_FLAG_NO_MAPCHANGE);
+        }
     }
 }
 

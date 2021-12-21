@@ -7,6 +7,10 @@
 #include <sdktools>
 #include <sdkhooks>
 
+#if !defined    CS_TEAM_NONE
+    #define     CS_TEAM_NONE    (0)
+#endif
+
 #if !defined    CS_TEAM_T
     #define     CS_TEAM_T       (2)
 #endif
@@ -63,7 +67,7 @@ public void OnMapStart()
 {
     if (!g_bPlayerTeamHooked)
     {
-        HookEventEx("player_team",                  _Player_Team_);
+        HookEventEx("player_team",                  _Player_Team_,      EventHookMode_Post);
 
         g_bPlayerTeamHooked =                       true;
     }
@@ -73,7 +77,7 @@ public void OnMapEnd()
 {
     if (g_bPlayerTeamHooked)
     {
-        UnhookEvent("player_team",                  _Player_Team_);
+        UnhookEvent("player_team",                  _Player_Team_,      EventHookMode_Post);
 
         g_bPlayerTeamHooked =                       false;
     }
@@ -104,7 +108,7 @@ public void _Player_Team_(Event hEv, const char[] szName, bool bNoBC)
     (
         (
             (
-                (nTeam = hEv.GetInt("team"))
+                (nTeam = hEv.GetInt("team", CS_TEAM_NONE))
                     ==
                 (CS_TEAM_T)
             )
@@ -117,7 +121,7 @@ public void _Player_Team_(Event hEv, const char[] szName, bool bNoBC)
         )
         &&
         (
-            (nEntity = GetClientOfUserId(hEv.GetInt("userid")))
+            (nEntity = GetClientOfUserId(hEv.GetInt("userid", 0)))
                 >
             (0)
         )

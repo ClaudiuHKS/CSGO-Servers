@@ -30,6 +30,13 @@ public Plugin myinfo =
 
 
 /**
+ * GLOBAL VARIABLES
+ */
+
+static bool g_bPlayerDeathHooked =              false;
+
+
+/**
  * CUSTOM PRIVATE FUNCTIONS
  */
 
@@ -87,20 +94,34 @@ static int _Get_Offs_(int nEntity, const char[] szProp)
  * CUSTOM PUBLIC FORWARDS
  */
 
-public void OnEntityCreated(int nEntity, const char[] szClass)
+public void OnPluginStart()
 {
-    if (StrContains(szClass, "RagDoll", false) != -1)
+    OnMapStart();
+}
+
+public void OnMapStart()
+{
+    if (!g_bPlayerDeathHooked)
     {
-        CreateTimer(0.000001, _Timer_Ragdoll_Velocity_, nEntity, TIMER_FLAG_NO_MAPCHANGE);
+        HookEventEx("player_death",     _Player_Death_Event_,       EventHookMode_Post);
+
+        g_bPlayerDeathHooked =          true;
     }
 }
 
-public void OnEntitySpawned(int nEntity, const char[] szClass)
+public void OnMapEnd()
 {
-    if (StrContains(szClass, "RagDoll", false) != -1)
+    if (g_bPlayerDeathHooked)
     {
-        CreateTimer(0.000001, _Timer_Ragdoll_Velocity_, nEntity, TIMER_FLAG_NO_MAPCHANGE);
+        UnhookEvent("player_death",     _Player_Death_Event_,       EventHookMode_Post);
+
+        g_bPlayerDeathHooked =          false;
     }
+}
+
+public void OnPluginEnd()
+{
+    OnMapEnd();
 }
 
 
@@ -108,31 +129,54 @@ public void OnEntitySpawned(int nEntity, const char[] szClass)
  * CUSTOM PUBLIC HANDLERS
  */
 
-public Action _Timer_Ragdoll_Velocity_(Handle hTimer, any nEntity)
+public void _Player_Death_Event_(Event hEv, const char[] szName, bool bNoBC)
 {
-    static int m_vecVelocity = 0, m_vecAbsVelocity = 0, m_vecForce = 0, m_vecRagdollVelocity = 0;
+    static int nVictimUserId = 0, nVictim = 0, nCorpse = 0, m_hRagdoll = 0, m_vecVelocity = 0, m_vecAbsVelocity = 0, m_vecForce = 0, m_vecRagdollVelocity = 0;
     static float fVelocity[3] = { 0.0, ... }, fAbsVelocity[3] = { 0.0, ... }, fForce[3] = { 0.0, ... }, fRagdollVelocity[3] = { 0.0, ... };
 
-    if (IsValidEntity(nEntity))
+    nVictimUserId = hEv.GetInt("userid", 0);
+
+    if (nVictimUserId > 0)
     {
-        _PREP_OFFS_(nEntity, m_vecVelocity,             "m_vecVelocity");
-        _PREP_OFFS_(nEntity, m_vecAbsVelocity,          "m_vecAbsVelocity");
-        _PREP_OFFS_(nEntity, m_vecForce,                "m_vecForce");
-        _PREP_OFFS_(nEntity, m_vecRagdollVelocity,      "m_vecRagdollVelocity");
+        nVictim = GetClientOfUserId(nVictimUserId);
 
-        GetEntDataVector(nEntity, m_vecVelocity,        fVelocity);
-        GetEntDataVector(nEntity, m_vecAbsVelocity,     fAbsVelocity);
-        GetEntDataVector(nEntity, m_vecForce,           fForce);
-        GetEntDataVector(nEntity, m_vecRagdollVelocity, fRagdollVelocity);
+        if (nVictim > 0)
+        {
+            if (IsClientConnected(nVictim) && IsClientInGame(nVictim))
+            {
+                if (!IsPlayerAlive(nVictim))
+                {
+                    _PREP_OFFS_(nVictim, m_hRagdoll,    "m_hRagdoll");
 
-        ScaleVector(fVelocity,                          2048.0);
-        ScaleVector(fAbsVelocity,                       2048.0);
-        ScaleVector(fForce,                             2048.0);
-        ScaleVector(fRagdollVelocity,                   2048.0);
+                    nCorpse = GetEntDataEnt2(nVictim,   m_hRagdoll);
 
-        SetEntDataVector(nEntity, m_vecVelocity,        fVelocity, true);
-        SetEntDataVector(nEntity, m_vecAbsVelocity,     fAbsVelocity, true);
-        SetEntDataVector(nEntity, m_vecForce, fForce,   true);
-        SetEntDataVector(nEntity, m_vecRagdollVelocity, fRagdollVelocity, true);
+                    if (nCorpse > 0)
+                    {
+                        if (IsValidEntity(nCorpse))
+                        {
+                            _PREP_OFFS_(nCorpse, m_vecVelocity,             "m_vecVelocity");
+                            _PREP_OFFS_(nCorpse, m_vecAbsVelocity,          "m_vecAbsVelocity");
+                            _PREP_OFFS_(nCorpse, m_vecForce,                "m_vecForce");
+                            _PREP_OFFS_(nCorpse, m_vecRagdollVelocity,      "m_vecRagdollVelocity");
+
+                            GetEntDataVector(nCorpse, m_vecVelocity,        fVelocity);
+                            GetEntDataVector(nCorpse, m_vecAbsVelocity,     fAbsVelocity);
+                            GetEntDataVector(nCorpse, m_vecForce,           fForce);
+                            GetEntDataVector(nCorpse, m_vecRagdollVelocity, fRagdollVelocity);
+
+                            ScaleVector(fVelocity,                          2.0);
+                            ScaleVector(fAbsVelocity,                       2.0);
+                            ScaleVector(fForce,                             2.0);
+                            ScaleVector(fRagdollVelocity,                   2.0);
+
+                            SetEntDataVector(nCorpse, m_vecVelocity,        fVelocity, true);
+                            SetEntDataVector(nCorpse, m_vecAbsVelocity,     fAbsVelocity, true);
+                            SetEntDataVector(nCorpse, m_vecForce, fForce,   true);
+                            SetEntDataVector(nCorpse, m_vecRagdollVelocity, fRagdollVelocity, true);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

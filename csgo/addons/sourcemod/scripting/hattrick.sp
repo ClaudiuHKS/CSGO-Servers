@@ -490,14 +490,14 @@ public void OnMapStart()
 
     if (!g_bPlayerDeathHooked)
     {
-        HookEventEx("player_death",                 _Player_Death_);
+        HookEventEx("player_death",                 _Player_Death_,     EventHookMode_Post);
 
         g_bPlayerDeathHooked =                      true;
     }
 
     if (!g_bPlayerTeamHooked)
     {
-        HookEventEx("player_team",                  _Player_Team_);
+        HookEventEx("player_team",                  _Player_Team_,      EventHookMode_Post);
 
         g_bPlayerTeamHooked =                       true;
     }
@@ -829,36 +829,20 @@ public void OnConfigsExecuted()
     }
 }
 
-public void OnEntityCreated(int nEntity, const char[] szClass)
-{
-    if (StrContains(szClass, "RagDoll", false) != -1)
-    {
-        CreateTimer(0.000001, _Timer_Ragdoll_Velocity_, nEntity, TIMER_FLAG_NO_MAPCHANGE);
-    }
-}
-
-public void OnEntitySpawned(int nEntity, const char[] szClass)
-{
-    if (StrContains(szClass, "RagDoll", false) != -1)
-    {
-        CreateTimer(0.000001, _Timer_Ragdoll_Velocity_, nEntity, TIMER_FLAG_NO_MAPCHANGE);
-    }
-}
-
 public void OnMapEnd()
 {
     static int nIter = 0;
 
     if (g_bPlayerDeathHooked)
     {
-        UnhookEvent("player_death",                 _Player_Death_);
+        UnhookEvent("player_death",                 _Player_Death_,     EventHookMode_Post);
 
         g_bPlayerDeathHooked =                      false;
     }
 
     if (g_bPlayerTeamHooked)
     {
-        UnhookEvent("player_team",                  _Player_Team_);
+        UnhookEvent("player_team",                  _Player_Team_,      EventHookMode_Post);
 
         g_bPlayerTeamHooked =                       false;
     }
@@ -1300,7 +1284,7 @@ public void _Player_Team_(Event hEv, const char[] szName, bool bNoBC)
     (
         (
             (
-                (nTeam = hEv.GetInt("team"))
+                (nTeam = hEv.GetInt("team", CS_TEAM_NONE))
                     ==
                 (CS_TEAM_T)
             )
@@ -1313,7 +1297,7 @@ public void _Player_Team_(Event hEv, const char[] szName, bool bNoBC)
         )
         &&
         (
-            (nEntity = GetClientOfUserId(hEv.GetInt("userid")))
+            (nEntity = GetClientOfUserId(hEv.GetInt("userid", 0)))
                 >
             (0)
         )
@@ -1349,58 +1333,76 @@ public void _Player_Team_(Event hEv, const char[] szName, bool bNoBC)
 
 public void _Player_Death_(Event hEv, const char[] szName, bool bNoBC)
 {
-    static int nKiller = 0, nEntity = 0, nVictim = 0, nPlayer = 0, m_bIsControllingBot = 0, m_iControlledBotEntIndex = 0;
+    static int nVictimUserId = 0, nKillerUserId = 0, nVictim = 0, nCorpse = 0, nPlayer = 0, m_bIsControllingBot = 0, m_iControlledBotEntIndex = 0, \
+        m_hRagdoll = 0, m_vecVelocity = 0, m_vecAbsVelocity = 0, m_vecForce = 0, m_vecRagdollVelocity = 0;
 
-    if
-    (
-        (
-            (
-                (nKiller = hEv.GetInt("attacker"))
-                    ==
-                (nVictim = hEv.GetInt("userid"))
-            )
-            ||
-            (
-                (nKiller)
-                    <
-                (1)
-            )
-        )
-        &&
-        (
-            ((nEntity = GetClientOfUserId(nVictim)))
-                >
-            (0)
-        )
-        &&
-        (
-            (IsClientConnected(nEntity))
-                ==
-            (true)
-        )
-        &&
-        (
-            (IsClientInGame(nEntity))
-                ==
-            (true)
-        )
-    )
+    static float fVelocity[3] = { 0.0, ... }, fAbsVelocity[3] = { 0.0, ... }, fForce[3] = { 0.0, ... }, fRagdollVelocity[3] = { 0.0, ... };
+
+    nVictimUserId = hEv.GetInt("userid", 0);
+
+    if (nVictimUserId > 0)
     {
-        _PREP_OFFS_(nEntity,            m_bIsControllingBot,        "m_bIsControllingBot");
+        nVictim = GetClientOfUserId(nVictimUserId);
 
-        if (GetEntData(nEntity,         m_bIsControllingBot,        1) > 0)
+        if (nVictim > 0)
         {
-            _PREP_OFFS_(nEntity,        m_iControlledBotEntIndex,   "m_iControlledBotEntIndex");
-
-            if ((nPlayer =              GetEntData(nEntity,         m_iControlledBotEntIndex)) > 0 && IsClientConnected(nPlayer)    && IsClientInGame(nPlayer))
+            if (IsClientConnected(nVictim) && IsClientInGame(nVictim))
             {
-                CreateTimer(0.000001,   _Timer_Decrease_Deaths_,    GetClientUserId(nPlayer),                                       TIMER_FLAG_NO_MAPCHANGE);
-            }
-        }
+                if (!IsPlayerAlive(nVictim))
+                {
+                    _PREP_OFFS_(nVictim, m_hRagdoll,    "m_hRagdoll");
 
-        else
-        {
-            CreateTimer(0.000001,       _Timer_Decrease_Deaths_,    GetClientUserId(nEntity),                                       TIMER_FLAG_NO_MAPCHANGE);
+                    nCorpse = GetEntDataEnt2(nVictim,   m_hRagdoll);
+
+                    if (nCorpse > 0)
+                    {
+                        if (IsValidEntity(nCorpse))
+                        {
+                            _PREP_OFFS_(nCorpse, m_vecVelocity,             "m_vecVelocity");
+                            _PREP_OFFS_(nCorpse, m_vecAbsVelocity,          "m_vecAbsVelocity");
+                            _PREP_OFFS_(nCorpse, m_vecForce,                "m_vecForce");
+                            _PREP_OFFS_(nCorpse, m_vecRagdollVelocity,      "m_vecRagdollVelocity");
+
+                            GetEntDataVector(nCorpse, m_vecVelocity,        fVelocity);
+                            GetEntDataVector(nCorpse, m_vecAbsVelocity,     fAbsVelocity);
+                            GetEntDataVector(nCorpse, m_vecForce,           fForce);
+                            GetEntDataVector(nCorpse, m_vecRagdollVelocity, fRagdollVelocity);
+
+                            ScaleVector(fVelocity,                          2.0);
+                            ScaleVector(fAbsVelocity,                       2.0);
+                            ScaleVector(fForce,                             2.0);
+                            ScaleVector(fRagdollVelocity,                   2.0);
+
+                            SetEntDataVector(nCorpse, m_vecVelocity,        fVelocity, true);
+                            SetEntDataVector(nCorpse, m_vecAbsVelocity,     fAbsVelocity, true);
+                            SetEntDataVector(nCorpse, m_vecForce, fForce,   true);
+                            SetEntDataVector(nCorpse, m_vecRagdollVelocity, fRagdollVelocity, true);
+                        }
+                    }
+
+                    nKillerUserId = hEv.GetInt("attacker", 0);
+
+                    if (nVictimUserId == nKillerUserId || nKillerUserId < 1)
+                    {
+                        _PREP_OFFS_(nVictim,            m_bIsControllingBot,        "m_bIsControllingBot");
+
+                        if (GetEntData(nVictim,         m_bIsControllingBot,        1) > 0)
+                        {
+                            _PREP_OFFS_(nVictim,        m_iControlledBotEntIndex,   "m_iControlledBotEntIndex");
+
+                            if ((nPlayer =              GetEntData(nVictim,         m_iControlledBotEntIndex)) > 0 && IsClientConnected(nPlayer)    && IsClientInGame(nPlayer))
+                            {
+                                CreateTimer(0.000001,   _Timer_Decrease_Deaths_,    GetClientUserId(nPlayer),                                       TIMER_FLAG_NO_MAPCHANGE);
+                            }
+                        }
+
+                        else
+                        {
+                            CreateTimer(0.000001,       _Timer_Decrease_Deaths_,    nVictimUserId,                                                  TIMER_FLAG_NO_MAPCHANGE);
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -1479,35 +1481,6 @@ public Action _Timer_Vote_Change_Map_(Handle hTimer, any nId)
 
             PrintToChat(nEntity,                    " \x01Done.");
         }
-    }
-}
-
-public Action _Timer_Ragdoll_Velocity_(Handle hTimer, any nEntity)
-{
-    static int m_vecVelocity = 0, m_vecAbsVelocity = 0, m_vecForce = 0, m_vecRagdollVelocity = 0;
-    static float fVelocity[3] = { 0.0, ... }, fAbsVelocity[3] = { 0.0, ... }, fForce[3] = { 0.0, ... }, fRagdollVelocity[3] = { 0.0, ... };
-
-    if (IsValidEntity(nEntity))
-    {
-        _PREP_OFFS_(nEntity, m_vecVelocity,             "m_vecVelocity");
-        _PREP_OFFS_(nEntity, m_vecAbsVelocity,          "m_vecAbsVelocity");
-        _PREP_OFFS_(nEntity, m_vecForce,                "m_vecForce");
-        _PREP_OFFS_(nEntity, m_vecRagdollVelocity,      "m_vecRagdollVelocity");
-
-        GetEntDataVector(nEntity, m_vecVelocity,        fVelocity);
-        GetEntDataVector(nEntity, m_vecAbsVelocity,     fAbsVelocity);
-        GetEntDataVector(nEntity, m_vecForce,           fForce);
-        GetEntDataVector(nEntity, m_vecRagdollVelocity, fRagdollVelocity);
-
-        ScaleVector(fVelocity,                          2048.0);
-        ScaleVector(fAbsVelocity,                       2048.0);
-        ScaleVector(fForce,                             2048.0);
-        ScaleVector(fRagdollVelocity,                   2048.0);
-
-        SetEntDataVector(nEntity, m_vecVelocity,        fVelocity, true);
-        SetEntDataVector(nEntity, m_vecAbsVelocity,     fAbsVelocity, true);
-        SetEntDataVector(nEntity, m_vecForce, fForce,   true);
-        SetEntDataVector(nEntity, m_vecRagdollVelocity, fRagdollVelocity, true);
     }
 }
 

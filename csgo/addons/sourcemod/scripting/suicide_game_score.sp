@@ -119,7 +119,7 @@ public void OnMapStart()
 
     if (!g_bPlayerDeathHooked)
     {
-        HookEventEx("player_death",                 _Player_Death_);
+        HookEventEx("player_death",                 _Player_Death_,     EventHookMode_Post);
 
         g_bPlayerDeathHooked =                      true;
     }
@@ -187,7 +187,7 @@ public void OnMapEnd()
 {
     if (g_bPlayerDeathHooked)
     {
-        UnhookEvent("player_death",                 _Player_Death_);
+        UnhookEvent("player_death",                 _Player_Death_,     EventHookMode_Post);
 
         g_bPlayerDeathHooked =                      false;
     }
@@ -225,58 +225,43 @@ public void OnPluginEnd()
 
 public void _Player_Death_(Event hEv, const char[] szName, bool bNoBC)
 {
-    static int nKiller = 0, nEntity = 0, nVictim = 0, nPlayer = 0, m_bIsControllingBot = 0, m_iControlledBotEntIndex = 0;
+    static int nVictimUserId = 0, nKillerUserId = 0, nVictim = 0, nPlayer = 0, m_bIsControllingBot = 0, m_iControlledBotEntIndex = 0;
 
-    if
-    (
-        (
-            (
-                (nKiller = hEv.GetInt("attacker"))
-                    ==
-                (nVictim = hEv.GetInt("userid"))
-            )
-            ||
-            (
-                (nKiller)
-                    <
-                (1)
-            )
-        )
-        &&
-        (
-            ((nEntity = GetClientOfUserId(nVictim)))
-                >
-            (0)
-        )
-        &&
-        (
-            (IsClientConnected(nEntity))
-                ==
-            (true)
-        )
-        &&
-        (
-            (IsClientInGame(nEntity))
-                ==
-            (true)
-        )
-    )
+    nVictimUserId = hEv.GetInt("userid", 0);
+
+    if (nVictimUserId > 0)
     {
-        _PREP_OFFS_(nEntity,            m_bIsControllingBot,        "m_bIsControllingBot");
+        nVictim = GetClientOfUserId(nVictimUserId);
 
-        if (GetEntData(nEntity,         m_bIsControllingBot,        1) > 0)
+        if (nVictim > 0)
         {
-            _PREP_OFFS_(nEntity,        m_iControlledBotEntIndex,   "m_iControlledBotEntIndex");
-
-            if ((nPlayer =              GetEntData(nEntity,         m_iControlledBotEntIndex)) > 0 && IsClientConnected(nPlayer)    && IsClientInGame(nPlayer))
+            if (IsClientConnected(nVictim) && IsClientInGame(nVictim))
             {
-                CreateTimer(0.000001,   _Timer_Decrease_Deaths_,    GetClientUserId(nPlayer),                                       TIMER_FLAG_NO_MAPCHANGE);
-            }
-        }
+                if (!IsPlayerAlive(nVictim))
+                {
+                    nKillerUserId = hEv.GetInt("attacker", 0);
 
-        else
-        {
-            CreateTimer(0.000001,       _Timer_Decrease_Deaths_,    GetClientUserId(nEntity),                                       TIMER_FLAG_NO_MAPCHANGE);
+                    if (nVictimUserId == nKillerUserId || nKillerUserId < 1)
+                    {
+                        _PREP_OFFS_(nVictim,            m_bIsControllingBot,        "m_bIsControllingBot");
+
+                        if (GetEntData(nVictim,         m_bIsControllingBot,        1) > 0)
+                        {
+                            _PREP_OFFS_(nVictim,        m_iControlledBotEntIndex,   "m_iControlledBotEntIndex");
+
+                            if ((nPlayer =              GetEntData(nVictim,         m_iControlledBotEntIndex)) > 0 && IsClientConnected(nPlayer)    && IsClientInGame(nPlayer))
+                            {
+                                CreateTimer(0.000001,   _Timer_Decrease_Deaths_,    GetClientUserId(nPlayer),                                       TIMER_FLAG_NO_MAPCHANGE);
+                            }
+                        }
+
+                        else
+                        {
+                            CreateTimer(0.000001,       _Timer_Decrease_Deaths_,    nVictimUserId,                                                  TIMER_FLAG_NO_MAPCHANGE);
+                        }
+                    }
+                }
+            }
         }
     }
 }
