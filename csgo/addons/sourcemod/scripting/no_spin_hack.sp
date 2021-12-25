@@ -88,6 +88,8 @@ public Action OnPlayerRunCmd(int nEntity, int& nButtons, int& nImpulse, float fV
     g_fAng[nEntity][0] = fAngles[0];
     g_fAng[nEntity][1] = fAngles[1];
     g_fAng[nEntity][2] = fAngles[2];
+
+    return Plugin_Continue;
 }
 
 
@@ -110,4 +112,6 @@ public Action _Take_Damage_Alive_(int nVictim, int& nAttacker, int& nInflictor, 
             }
         }
     }
+
+    return Plugin_Continue;
 }

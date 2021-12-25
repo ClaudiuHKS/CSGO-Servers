@@ -153,6 +153,8 @@ public Action displayJoinInfo(Handle hTimer, any nClientUserId)
 
         g_fStamp    =       fEngTime        +               CHAT_SPAM_DELAY;
     }
+
+    return Plugin_Continue;
 }
 
 public void OnPlrConnect_Pre(Handle hEv,    const char[]    szEvName,   bool bEvNoBC)
@@ -346,6 +348,8 @@ public Action Timer_TeamJoin(Handle hTimer, any hPack)
             }
         }
     }
+
+    return Plugin_Continue;
 }
 
 #endif
@@ -397,6 +401,8 @@ public Action Timer_Left(Handle hTimer,         any hPack)
             g_fStamp = fEngTime + CHAT_SPAM_DELAY;
         }
     }
+
+    return Plugin_Continue;
 }
 
 #endif

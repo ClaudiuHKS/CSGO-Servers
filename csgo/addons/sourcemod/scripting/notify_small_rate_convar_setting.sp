@@ -117,6 +117,8 @@ public Action CS_OnTerminateRound(float& fDelay, CSRoundEndReason& nReason)
             QueryClientConVar(nPlayer, "rate", _Rate_Con_Var_Check_);
         }
     }
+
+    return Plugin_Continue;
 }
 
 

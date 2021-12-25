@@ -396,6 +396,8 @@ public Action Timer_PutInServer_Delayed(Handle hTimer, any nClientUserId) // Del
     {
         QueryClientCheatingConVar(nClient); // Start Checking The Player's ConVars
     }
+
+    return Plugin_Continue;
 }
 
 #if defined CHECK_SV_SKYNAME_TOO
@@ -414,6 +416,8 @@ public Action Timer_SkyName_Global_Check(Handle hTimer) // Check All The Players
             }
         }
     }
+
+    return Plugin_Continue;
 }
 
 #endif

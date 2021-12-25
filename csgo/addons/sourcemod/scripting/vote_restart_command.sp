@@ -99,4 +99,6 @@ public Action _Timer_Vote_Restart_Game_(Handle hTimer, any nId)
             PrintToChat(nEntity,                    " \x01Done.");
         }
     }
+
+    return Plugin_Continue;
 }

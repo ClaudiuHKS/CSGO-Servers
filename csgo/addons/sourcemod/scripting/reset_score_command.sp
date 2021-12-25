@@ -161,4 +161,6 @@ public Action _Timer_Zero_Score_(Handle hTimer, any nId)
 
         PrintToChat(nEntity,    " \x01Done.");
     }
+
+    return Plugin_Continue;
 }

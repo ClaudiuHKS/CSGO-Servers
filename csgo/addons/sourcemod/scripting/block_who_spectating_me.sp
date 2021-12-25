@@ -118,6 +118,8 @@ public Action Timer_PlayerStateChanged(Handle hTimer, any nUserId)
     {
         g_bAlive[nClient] = IsPlayerAlive(nClient);
     }
+
+    return Plugin_Continue;
 }
 
 public Action Hook_SetTransmit(int nEntity, int nClient)

@@ -1123,11 +1123,15 @@ public Action CS_OnTerminateRound(float& fDelay, CSRoundEndReason& nReason)
             QueryClientConVar(nPlayer, "rate", _Rate_Con_Var_Check_);
         }
     }
+
+    return Plugin_Continue;
 }
 
 public Action OnPlayerRunCmd(int nEntity, int& nButtons, int& nImpulse, float fVelocity[3], float fAngles[3], int& nWeapon, int& nSubType, int& nCmdNum, int& nTickCount, int& nSeed, int nMouseDir[2])
 {
     nButtons |= IN_BULLRUSH;
+
+    return Plugin_Continue;
 }
 
 
@@ -1422,6 +1426,8 @@ public Action _Timer_Decrease_Deaths_(Handle hTimer, any nId)
             SetEntData(nEntity, m_iDeaths,          nDeaths - 1);
         }
     }
+
+    return Plugin_Continue;
 }
 
 public Action _Timer_Zero_Score_(Handle hTimer, any nId)
@@ -1442,6 +1448,8 @@ public Action _Timer_Zero_Score_(Handle hTimer, any nId)
 
         PrintToChat(nEntity,    " \x01Done.");
     }
+
+    return Plugin_Continue;
 }
 
 public Action _Timer_Vote_Restart_Game_(Handle hTimer, any nId)
@@ -1462,6 +1470,8 @@ public Action _Timer_Vote_Restart_Game_(Handle hTimer, any nId)
             PrintToChat(nEntity,                    " \x01Done.");
         }
     }
+
+    return Plugin_Continue;
 }
 
 public Action _Timer_Vote_Change_Map_(Handle hTimer, any nId)
@@ -1482,6 +1492,8 @@ public Action _Timer_Vote_Change_Map_(Handle hTimer, any nId)
             PrintToChat(nEntity,                    " \x01Done.");
         }
     }
+
+    return Plugin_Continue;
 }
 
 public Action _SM_CVar_(int nClient, int nArgs)

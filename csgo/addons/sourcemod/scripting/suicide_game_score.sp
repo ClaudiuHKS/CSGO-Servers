@@ -281,6 +281,8 @@ public Action _Timer_Decrease_Deaths_(Handle hTimer, any nId)
             SetEntData(nEntity, m_iDeaths,          nDeaths - 1);
         }
     }
+
+    return Plugin_Continue;
 }
 
 public void _Con_Var_Change_(Handle hConVar, const char[] szOld, const char[] szNew)
