@@ -70,6 +70,15 @@ public Plugin myinfo =
  * GLOBAL VARIABLES
  */
 
+static const char g_szGoreEffects[][] =
+{
+    "blood_impact_headshot_01b", \
+    "blood_impact_headshot_01d", \
+    "blood_impact_red_01_chunk",
+};
+
+static const char g_szIPS[] = "info_particle_system";
+
 static bool g_bMsgShown[MAXPLAYERS] =           { false, ... };
 static bool g_bRateMsgShown[MAXPLAYERS] =       { false, ... };
 
@@ -86,8 +95,11 @@ static int g_nPatchOrigBytes[512] =             { 0, ... };
 
 static Address g_hPatchAddr =                   Address_Null;
 
+static bool g_bLateLoaded =                     false;
 static bool g_bPatchStatus =                    false;
+static bool g_bMapStartedToLoad =               false;
 
+static bool g_bPlayerDmgHooked =                false;
 static bool g_bPlayerDeathHooked =              false;
 static bool g_bPlayerTeamHooked =               false;
 
@@ -104,6 +116,76 @@ static float g_fRateMsgTimeStamp =              0.0;
 /**
  * CUSTOM PRIVATE FUNCTIONS
  */
+
+static void _Precache_Gore_Effect_(const char[] szName)
+{
+    static int nEnty = 0;
+
+    if (g_bMapStartedToLoad)
+    {
+        nEnty = CreateEntityByName(g_szIPS);
+
+        if (nEnty > 0)
+        {
+            if (IsValidEntity(nEnty))
+            {
+                if (DispatchKeyValue(nEnty, "effect_name", szName))
+                {
+                    if (DispatchSpawn(nEnty))
+                    {
+                        ActivateEntity(nEnty);
+
+                        AcceptEntityInput(nEnty, "START");
+                    }
+                }
+
+                CreateTimer(1.0, _Timer_Remove_Gore_Effect_, nEnty, TIMER_FLAG_NO_MAPCHANGE);
+            }
+        }
+    }
+}
+
+static void _Create_Random_Gore_Effect_(int nVictim, const char[] szName)
+{
+    static float fEyePos[3] = { 0.0, ... }, fEyeAng[3] = { 0.0, ... };
+    static char szEyeAng[128] = { 0, ... };
+    static int nEnty = 0;
+
+    if (GetRandomInt(1, 2) == 1)
+    {
+        nEnty = CreateEntityByName(g_szIPS);
+
+        if (nEnty > 0)
+        {
+            if (IsValidEntity(nEnty))
+            {
+                GetClientEyePosition(nVictim, fEyePos);
+
+                if (GetClientEyeAngles(nVictim, fEyeAng))
+                {
+                    TeleportEntity(nEnty, fEyePos, fEyeAng, NULL_VECTOR);
+
+                    if (DispatchKeyValue(nEnty, "effect_name", szName))
+                    {
+                        FormatEx(szEyeAng, sizeof (szEyeAng), "%f %f %f", fEyeAng[0], fEyeAng[1], fEyeAng[2]);
+
+                        if (DispatchKeyValue(nEnty, "angles", szEyeAng))
+                        {
+                            if (DispatchSpawn(nEnty))
+                            {
+                                ActivateEntity(nEnty);
+
+                                AcceptEntityInput(nEnty, "START");
+                            }
+                        }
+                    }
+                }
+
+                CreateTimer(1.0, _Timer_Remove_Gore_Effect_, nEnty, TIMER_FLAG_NO_MAPCHANGE);
+            }
+        }
+    }
+}
 
 static bool _Create_Dir_(const char[] szDirPath, const int nFlags = \
     ((FPERM_U_READ | FPERM_U_WRITE | FPERM_U_EXEC) | \
@@ -435,11 +517,18 @@ public APLRes AskPluginLoad2(Handle hSelf, bool bLateLoaded, char[] szError, int
         return APLRes_Failure;
     }
 
+    g_bLateLoaded = bLateLoaded;
+
     return APLRes_Success;
 }
 
 public void OnPluginStart()
 {
+    if (g_bLateLoaded)
+    {
+        g_bMapStartedToLoad = true;
+    }
+
     RegAdminCmd("sm_cvar",              _SM_CVar_,              ADMFLAG_CONVARS,    _DESC_SM_CVAR_,             "cvar");
     RegAdminCmd("sm_exec_tick_cfg",     _SM_Exec_Tick_Cfg_,     ADMFLAG_CONFIG,     _DESC_SM_EXEC_TICK_CFG_,    "exec");
 
@@ -486,6 +575,13 @@ public void OnMapStart()
                 }
             }
         }
+    }
+
+    if (!g_bPlayerDmgHooked)
+    {
+        HookEventEx("player_hurt",                  _Player_Damage_Ev_, EventHookMode_Post);
+
+        g_bPlayerDmgHooked =                        true;
     }
 
     if (!g_bPlayerDeathHooked)
@@ -766,6 +862,14 @@ public void OnMapStart()
     }
 
     g_fRateMsgTimeStamp = 0.0;
+
+    if (g_bMapStartedToLoad)
+    {
+        for (nIter = 0; nIter < sizeof (g_szGoreEffects); nIter++)
+        {
+            _Precache_Gore_Effect_(g_szGoreEffects[nIter]);
+        }
+    }
 }
 
 public void OnConfigsExecuted()
@@ -832,6 +936,13 @@ public void OnConfigsExecuted()
 public void OnMapEnd()
 {
     static int nIter = 0;
+
+    if (g_bPlayerDmgHooked)
+    {
+        UnhookEvent("player_hurt",                  _Player_Damage_Ev_, EventHookMode_Post);
+
+        g_bPlayerDmgHooked =                        false;
+    }
 
     if (g_bPlayerDeathHooked)
     {
@@ -926,12 +1037,18 @@ public void OnMapEnd()
         }
     }
 
-    g_fRateMsgTimeStamp = 0.0;
+    g_fRateMsgTimeStamp =           0.0;
+    g_bMapStartedToLoad =           false;
 }
 
 public void OnPluginEnd()
 {
     OnMapEnd();
+}
+
+public void OnMapInit(const char[] szMap)
+{
+    g_bMapStartedToLoad = true;
 }
 
 public bool OnClientConnect(int nEntity, char[] szError, int nMaxLen)
@@ -1335,6 +1452,35 @@ public void _Player_Team_(Event hEv, const char[] szName, bool bNoBC)
     }
 }
 
+public void _Player_Damage_Ev_(Handle hEv, const char[] szEvName, bool bEvNoBC)
+{
+    static int nVictimUserId = 0, nVictim = 0, nGoreEffect = 0;
+
+    if (hEv != INVALID_HANDLE)
+    {
+        if (GetEventInt(hEv, "hitgroup", 0) == 1)
+        {
+            nVictimUserId = GetEventInt(hEv, "userid", 0);
+
+            if (nVictimUserId > 0)
+            {
+                nVictim = GetClientOfUserId(nVictimUserId);
+
+                if (nVictim > 0)
+                {
+                    if (IsClientConnected(nVictim) && IsClientInGame(nVictim))
+                    {
+                        for (nGoreEffect = 0; nGoreEffect < sizeof (g_szGoreEffects); nGoreEffect++)
+                        {
+                            _Create_Random_Gore_Effect_(nVictim, g_szGoreEffects[nGoreEffect]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 public void _Player_Death_(Event hEv, const char[] szName, bool bNoBC)
 {
     static int nVictimUserId = 0, nKillerUserId = 0, nVictim = 0, nCorpse = 0, nPlayer = 0, m_bIsControllingBot = 0, m_iControlledBotEntIndex = 0, \
@@ -1409,6 +1555,27 @@ public void _Player_Death_(Event hEv, const char[] szName, bool bNoBC)
             }
         }
     }
+}
+
+public Action _Timer_Remove_Gore_Effect_(Handle hTimer, any nEnty)
+{
+    static char szClass[64] = { 0, ... };
+
+    if (nEnty > 0)
+    {
+        if (IsValidEntity(nEnty))
+        {
+            if (GetEntityClassname(nEnty, szClass, sizeof (szClass)))
+            {
+                if (strcmp(szClass, g_szIPS, false) == 0)
+                {
+                    AcceptEntityInput(nEnty, "KILLHIERARCHY");
+                }
+            }
+        }
+    }
+
+    return Plugin_Continue;
 }
 
 public Action _Timer_Decrease_Deaths_(Handle hTimer, any nId)
