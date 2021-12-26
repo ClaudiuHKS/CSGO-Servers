@@ -165,6 +165,11 @@ public void OnMapEnd()
     g_bMapStartedToLoad = false;
 }
 
+public void OnPluginEnd()
+{
+    OnMapEnd();
+}
+
 public void OnMapInit(const char[] szMap)
 {
     g_bMapStartedToLoad = true;
