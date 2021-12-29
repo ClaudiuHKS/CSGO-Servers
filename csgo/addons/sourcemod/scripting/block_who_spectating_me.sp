@@ -126,7 +126,7 @@ public Action Hook_SetTransmit(int nEntity, int nClient)
 {
     if (g_bAlive[nClient] &&    !g_bAlive[nEntity])
     {
-        return Plugin_Handled;  // If I'm alive, the game server shouldn't transmit through the Internet any dead players to me!
+        return Plugin_Handled;
     }
 
     return Plugin_Continue;

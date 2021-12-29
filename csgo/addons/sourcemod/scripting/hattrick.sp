@@ -5,7 +5,6 @@
 
 #include <sourcemod>
 #include <sdktools>
-#include <sdkhooks>
 #include <cstrike>
 
 
@@ -43,6 +42,8 @@
 
 #define _DESC_SM_EXEC_TICK_CFG_     "sm_exec_tick_cfg - Executes The Tick Based Config File"
 #define _DESC_SM_EXEC_TICK_CFG_COL_ " \x01sm_exec_tick_cfg\x09 -\x05 Executes The Tick Based Config File"
+
+#define _MIN_DIST_SPAWN_POINTS_     56.000000
 
 
 /**
@@ -185,6 +186,21 @@ static void _Create_Random_Gore_Effect_(int nVictim, const char[] szName)
             }
         }
     }
+}
+
+static float _Vec_Dis_2D_(const float fPosA[3], const float fPosB[3])
+{
+    static float fTmpPosA[3] = { 0.000000, ... }, fTmpPosB[3] = { 0.000000, ... };
+
+    fTmpPosA[0] = fPosA[0];
+    fTmpPosA[1] = fPosA[1];
+    fTmpPosA[2] = 0.0;
+
+    fTmpPosB[0] = fPosB[0];
+    fTmpPosB[1] = fPosB[1];
+    fTmpPosB[2] = 0.0;
+
+    return GetVectorDistance(fTmpPosA, fTmpPosB, false);
 }
 
 static bool _Create_Dir_(const char[] szDirPath, const int nFlags = \
@@ -542,12 +558,14 @@ public void OnMapStart()
     static char szFullIpAddr[PLATFORM_MAX_PATH] = { 0, ... }, szDataPath[PLATFORM_MAX_PATH] = { 0, ... }, szSteamKeysKvFile[PLATFORM_MAX_PATH] = { 0, ... },
         szSteamKey[PLATFORM_MAX_PATH] = { 0, ... }, szTickRateKvFile[PLATFORM_MAX_PATH] = { 0, ... }, szTickRate[PLATFORM_MAX_PATH] = { 0, ... },
         szDefaultTickRate[PLATFORM_MAX_PATH] = { 0, ... }, szHours[PLATFORM_MAX_PATH] = { 0, ... }, szCurrentHour[PLATFORM_MAX_PATH] = { 0, ... },
-        szBuffer[PLATFORM_MAX_PATH] = { 0, ... };
+        szBuffer[PLATFORM_MAX_PATH] = { 0, ... }, szCfg[PLATFORM_MAX_PATH] = { 0, ... };
 
-    static Handle hData = INVALID_HANDLE;
-    static int nIter = 0, nTickInterval = 0, nHostStateInterval = 0, nTickRate = 0, nDefaultTickRate = 0;
+    static int nIter = 0, nTickInterval = 0, nHostStateInterval = 0, nTickRate = 0, nDefaultTickRate = 0, nTeam = 0, nEnty = 0, m_vecOrigin = 0;
     static Address hStartSound = Address_Null, hSpawnServer = Address_Null, hTickInterval = Address_Null, hIntervalPerTick = Address_Null;
+    static float fPos[3] = { 0.000000, ... }, fAng[3] = { 0.000000, ... }, fExPos[3] = { 0.000000, ... };
     static float fIntervalPerTick = 0.0, fDefaultIntervalPerTick = 0.0;
+    static Handle hData = INVALID_HANDLE;
+    static bool bSpawn = false;
 
     BuildPath(Path_SM, szDataPath, sizeof (szDataPath), "data");
 
@@ -868,6 +886,94 @@ public void OnMapStart()
         for (nIter = 0; nIter < sizeof (g_szGoreEffects); nIter++)
         {
             _Precache_Gore_Effect_(g_szGoreEffects[nIter]);
+        }
+
+        GetCurrentMap(szBuffer, sizeof (szBuffer));
+
+        for (nIter = 0; nIter < strlen(szBuffer); nIter++)
+        {
+            szBuffer[nIter] = CharToLower(szBuffer[nIter]);
+        }
+
+        hData = CreateKeyValues(szBuffer);
+
+        if (hData != INVALID_HANDLE)
+        {
+            BuildPath(Path_SM, szCfg, sizeof (szCfg), "configs/spawns_%s.cfg", szBuffer);
+
+            if (FileToKeyValues(hData, szCfg))
+            {
+                nIter = 0;
+
+                FormatEx(szBuffer, sizeof (szBuffer), "spawn_%d_origin", nIter);
+                KvGetVector(hData, szBuffer, fPos);
+
+                while (fPos[0] != 0.000000)
+                {
+                    FormatEx(szBuffer, sizeof (szBuffer), "spawn_%d_angles", nIter);
+                    KvGetVector(hData, szBuffer, fAng);
+
+                    fAng[0] = 0.000000;
+                    fAng[2] = 0.000000;
+
+                    FormatEx(szBuffer, sizeof (szBuffer), "spawn_%d_team", nIter);
+                    nTeam = KvGetNum(hData, szBuffer);
+
+                    nEnty = INVALID_ENT_REFERENCE;
+                    bSpawn = true;
+
+                    if (nTeam == CS_TEAM_T)
+                    {
+                        while ((nEnty = FindEntityByClassname(nEnty, "info_player_terrorist")) != INVALID_ENT_REFERENCE)
+                        {
+                            _PREP_OFFS_(nEnty, m_vecOrigin, "m_vecOrigin");
+                            GetEntDataVector(nEnty, m_vecOrigin, fExPos);
+
+                            if (_Vec_Dis_2D_(fExPos, fPos) < _MIN_DIST_SPAWN_POINTS_)
+                            {
+                                bSpawn = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    else
+                    {
+                        while ((nEnty = FindEntityByClassname(nEnty, "info_player_counterterrorist")) != INVALID_ENT_REFERENCE)
+                        {
+                            _PREP_OFFS_(nEnty, m_vecOrigin, "m_vecOrigin");
+                            GetEntDataVector(nEnty, m_vecOrigin, fExPos);
+
+                            if (_Vec_Dis_2D_(fExPos, fPos) < _MIN_DIST_SPAWN_POINTS_)
+                            {
+                                bSpawn = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (bSpawn)
+                    {
+                        nEnty = CreateEntityByName(nTeam == CS_TEAM_T ? "info_player_terrorist" : "info_player_counterterrorist");
+
+                        if (nEnty > 0)
+                        {
+                            if (IsValidEntity(nEnty))
+                            {
+                                if (DispatchSpawn(nEnty))
+                                {
+                                    TeleportEntity(nEnty, fPos, fAng, NULL_VECTOR);
+                                }
+                            }
+                        }
+                    }
+
+                    FormatEx(szBuffer, sizeof (szBuffer), "spawn_%d_origin", ++nIter);
+                    KvGetVector(hData, szBuffer, fPos);
+                }
+            }
+
+            CloseHandle(hData);
         }
     }
 }

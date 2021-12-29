@@ -5,7 +5,6 @@
 
 #include <sourcemod>
 #include <sdktools>
-#include <sdkhooks>
 
 #if !defined    CS_TEAM_NONE
     #define     CS_TEAM_NONE    (0)
