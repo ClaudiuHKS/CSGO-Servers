@@ -1,0 +1,21 @@
+CXXABI_1.3
+
+GLIBC_2.0
+GLIBC_2.1
+GLIBC_2.2
+GLIBC_2.2.4
+GLIBC_2.3
+GLIBC_2.1.3
+
+GLIBCXX_3.4.14
+GLIBCXX_3.4
+GLIBCXX_3.4.21
+
+libtier0.so
+libsteam_api.so
+libdl.so.2
+libpthread.so.0
+libstdc++.so.6
+libc.so.6
+
+SSE CPU

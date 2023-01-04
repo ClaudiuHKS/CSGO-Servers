@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31220.234
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GeoResolver", "GeoResolver.vcxproj", "{6817265B-B45C-4A6B-88E7-0552672BB443}"
+Project("{12C9FEB8-46FA-11D0-8469-00A0F91FCE4A}") = "GeoResolver", "GeoResolver.vcxproj", "{08A7035B-BB5F-F0CA-8FC7-05BF670BAF4E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6817265B-B45C-4A6B-88E7-0552672BB443}.Release|x86.ActiveCfg = Release|Win32
-		{6817265B-B45C-4A6B-88E7-0552672BB443}.Release|x86.Build.0 = Release|Win32
+		{08A7035B-BB5F-F0CA-8FC7-05BF670BAF4E}.Release|x86.ActiveCfg = Release|Win32
+		{08A7035B-BB5F-F0CA-8FC7-05BF670BAF4E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

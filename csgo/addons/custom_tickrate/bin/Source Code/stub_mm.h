@@ -21,7 +21,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 
 #define xTo(Var, Type) ((Type)(Var))
 #define maxRealPrecision (::std::numeric_limits<long double>::max_digits10)

@@ -1,0 +1,4 @@
+Microsoft Visual C++ Redistributable
+
+SSE2 CPU
+

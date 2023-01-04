@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31220.234
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UpdateLinuxSystem", "UpdateLinuxSystem.vcxproj", "{6817265B-B45C-4A6B-88E7-0552672BB443}"
+Project("{53A3C3B0-893A-17D3-8013-C0C2C9C4C9C6}") = "UpdateLinuxSystem", "UpdateLinuxSystem.vcxproj", "{B0141B5B-B70C-428B-BBE7-CBB5470BB77B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6817265B-B45C-4A6B-88E7-0552672BB443}.Release|x86.ActiveCfg = Release|Win32
-		{6817265B-B45C-4A6B-88E7-0552672BB443}.Release|x86.Build.0 = Release|Win32
+		{B0141B5B-B70C-428B-BBE7-CBB5470BB77B}.Release|x86.ActiveCfg = Release|Win32
+		{B0141B5B-B70C-428B-BBE7-CBB5470BB77B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

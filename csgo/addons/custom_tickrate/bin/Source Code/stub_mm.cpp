@@ -30,21 +30,19 @@ bool CustomTickRate::Load(PluginId id, ISmmAPI* ismm, char* error, unsigned int 
     PLUGIN_SAVEVARS();
 
     GET_V_IFACE_CURRENT(GetEngineFactory, g_pICvar_, ICvar, CVAR_INTERFACE_VERSION);
-
-#if SOURCE_ENGINE >= SE_ORANGEBOX
-
-    g_pCVar = g_pICvar_;
-
-#endif
+    {
+        g_pCVar = g_pICvar_;
+    }
 
     GET_V_IFACE_CURRENT(GetEngineFactory, g_pIVEngineServer_, IVEngineServer, INTERFACEVERSION_VENGINESERVER);
-    GET_V_IFACE_CURRENT(GetEngineFactory, g_pIFileSystem_, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
     GET_V_IFACE_CURRENT(GetEngineFactory, g_pIGameEventManager2_, IGameEventManager2, INTERFACEVERSION_GAMEEVENTSMANAGER2);
     GET_V_IFACE_CURRENT(GetEngineFactory, g_pIServerPluginHelpers_, IServerPluginHelpers, INTERFACEVERSION_ISERVERPLUGINHELPERS);
 
-    GET_V_IFACE_ANY(GetServerFactory, g_pIPlayerInfoManager_, IPlayerInfoManager, INTERFACEVERSION_PLAYERINFOMANAGER);
-    GET_V_IFACE_ANY(GetServerFactory, g_pIServerGameClients_, IServerGameClients, INTERFACEVERSION_SERVERGAMECLIENTS);
-    GET_V_IFACE_ANY(GetServerFactory, g_pIServerGameDLL_, IServerGameDLL, INTERFACEVERSION_SERVERGAMEDLL);
+    GET_V_IFACE_CURRENT(GetServerFactory, g_pIPlayerInfoManager_, IPlayerInfoManager, INTERFACEVERSION_PLAYERINFOMANAGER);
+    GET_V_IFACE_CURRENT(GetServerFactory, g_pIServerGameClients_, IServerGameClients, INTERFACEVERSION_SERVERGAMECLIENTS);
+    GET_V_IFACE_CURRENT(GetServerFactory, g_pIServerGameDLL_, IServerGameDLL, INTERFACEVERSION_SERVERGAMEDLL);
+
+    GET_V_IFACE_CURRENT(GetFileSystemFactory, g_pIFileSystem_, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
 
     g_pCGlobalVars_ = ismm->GetCGlobals();
 

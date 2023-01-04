@@ -9,7 +9,7 @@
   <ItemGroup>
     <ClCompile Include="data-pool.c" />
     <ClCompile Include="extension.cpp" />
-    <ClCompile Include="$(SOURCEMOD)\public\smsdk_ext.cpp" />
+    <ClCompile Include="$(SM)\public\smsdk_ext.cpp" />
     <ClCompile Include="GeoIP.c" />
     <ClCompile Include="GeoIPCity.c" />
     <ClCompile Include="GeoIP_deprecated.c" />
@@ -21,17 +21,19 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{6817265b-b45c-4a6b-88e7-0552672bb443}</ProjectGuid>
+    <ProjectGuid>{08A7035B-BB5F-F0CA-8FC7-05BF670BAF4E}</ProjectGuid>
     <RootNamespace>GeoResolver</RootNamespace>
+    <ProjectName>GeoResolver</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
+    <EnableFuzzer>false</EnableFuzzer>
     <SpectreMitigation>false</SpectreMitigation>
     <PreferredToolArchitecture>x86</PreferredToolArchitecture>
   </PropertyGroup>
@@ -60,7 +62,7 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>PACKAGE_VERSION="1.6.0";GEOIP_STATIC;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;SOURCEMOD_BUILD;WIN32;NDEBUG;_HAS_EXCEPTIONS=0;_USE_MATH_DEFINES;COMPILER_MSVC;COMPILER_MSVC32;COMPILER_MSVC_32;COMPILER_MSVC86;COMPILER_MSVC_86;COMPILER_MSVCX86;COMPILER_MSVC_X86;SOURCE_ENGINE=SE_CSGO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>META_NO_HL2SDK;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;PACKAGE_VERSION="1.6.0";GEOIP_STATIC;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;SOURCEMOD_BUILD;WIN32;NDEBUG;_HAS_EXCEPTIONS=0;_USE_MATH_DEFINES;COMPILER_MSVC;COMPILER_MSVC32;COMPILER_MSVC_32;COMPILER_MSVC86;COMPILER_MSVC_86;COMPILER_MSVCX86;COMPILER_MSVC_X86;SOURCE_ENGINE=SE_CSGO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <DebugInformationFormat>None</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -72,10 +74,10 @@
       <FloatingPointExceptions>false</FloatingPointExceptions>
       <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <EnforceTypeConversionRules>false</EnforceTypeConversionRules>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalOptions>/Gw /utf-8 /D SE_ALIEN_SWARM=10 /D SE_ALIENSWARM=10 /D SE_BLOODY_GOOD_TIME=4 /D SE_BLOODY_GOODTIME=4 /D SE_BLOODYGOOD_TIME=4 /D SE_BLOODYGOODTIME=4 /D SE_CS_GO=12 /D SE_CS_S=6 /D SE_CS_SOURCE=6 /D SE_CSGO=12 /D SE_CSS=6 /D SE_CSSOURCE=6 /D SE_DARK_MESSIAH=2 /D SE_DARKMESSIAH=2 /D SE_EPISODE1=1 /D SE_EPISODE_1=1 /D SE_EPISODE_ONE=1 /D SE_EPISODEONE=1 /D SE_EYE=5 /D SE_EYES=5 /D SE_LEFT4DEAD2=9 /D SE_LEFT4DEAD=8 /D SE_LEFT4DEAD_2=9 /D SE_LEFT4DEAD_TWO=9 /D SE_LEFT4DEADTWO=9 /D SE_LEFT_4_DEAD2=9 /D SE_LEFT_4_DEAD=8 /D SE_LEFT_4_DEAD_2=9 /D SE_LEFT_4_DEAD_TWO=9 /D SE_LEFT_4_DEADTWO=9 /D SE_LEFT_FOR_DEAD2=9 /D SE_LEFT_FOR_DEAD=8 /D SE_LEFT_FOR_DEAD_2=9 /D SE_LEFT_FOR_DEAD_TWO=9 /D SE_LEFT_FOR_DEADTWO=9 /D SE_LEFTFORDEAD2=9 /D SE_LEFTFORDEAD=8 /D SE_LEFTFORDEAD_2=9 /D SE_LEFTFORDEAD_TWO=9 /D SE_LEFTFORDEADTWO=9 /D SE_ORANGE_BOX=3 /D SE_ORANGE_BOX_VALVE=7 /D SE_ORANGE_BOXVALVE=7 /D SE_ORANGEBOX=3 /D SE_ORANGEBOX_VALVE=7 /D SE_ORANGEBOXVALVE=7 /D SE_PORTAL2=11 /D SE_PORTAL_2=11 /D SE_PORTAL_TWO=11 /D SE_PORTALTWO=11 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Gw /utf-8 /D SE_DODS=8 /D SE_DOD_S=8 /D SE_DODSOURCE=8 /D SE_DOD_SOURCE=8 /D SE_EP1=1 /D SE_EPONE=1 /D SE_EP_1=1 /D SE_EP_ONE=1 /D SE_L4D=13 /D SE_L4D2=16 /D SE_HL1=0 /D SE_HL_1=0 /D SE_HLONE=0 /D SE_HL_ONE=0 /D SE_ALIEN_SWARM=17 /D SE_ALIENSWARM=17 /D SE_BLOODY_GOOD_TIME=4 /D SE_BLOODY_GOODTIME=4 /D SE_BLOODYGOOD_TIME=4 /D SE_BLOODYGOODTIME=4 /D SE_CS_GO=23 /D SE_CS_S=6 /D SE_CS_SOURCE=6 /D SE_CSGO=23 /D SE_CSS=6 /D SE_CSSOURCE=6 /D SE_DARK_MESSIAH=2 /D SE_DARKMESSIAH=2 /D SE_EPISODE1=1 /D SE_EPISODE_1=1 /D SE_EPISODE_ONE=1 /D SE_EPISODEONE=1 /D SE_EYE=5 /D SE_EYES=5 /D SE_LEFT4DEAD2=16 /D SE_LEFT4DEAD=13 /D SE_LEFT4DEAD_2=16 /D SE_LEFT4DEAD_TWO=16 /D SE_LEFT4DEADTWO=16 /D SE_LEFT_4_DEAD2=16 /D SE_LEFT_4_DEAD=13 /D SE_LEFT_4_DEAD_2=16 /D SE_LEFT_4_DEAD_TWO=16 /D SE_LEFT_4_DEADTWO=16 /D SE_LEFT_FOR_DEAD2=16 /D SE_LEFT_FOR_DEAD=13 /D SE_LEFT_FOR_DEAD_2=16 /D SE_LEFT_FOR_DEAD_TWO=16 /D SE_LEFT_FOR_DEADTWO=16 /D SE_LEFTFORDEAD2=16 /D SE_LEFTFORDEAD=13 /D SE_LEFTFORDEAD_2=16 /D SE_LEFTFORDEAD_TWO=16 /D SE_LEFTFORDEADTWO=16 /D SE_ORANGE_BOX=3 /D SE_ORANGE_BOX_VALVE=7 /D SE_ORANGE_BOXVALVE=7 /D SE_ORANGEBOX=3 /D SE_ORANGEBOX_VALVE=7 /D SE_ORANGEBOXVALVE=7 /D SE_PORTAL2=18 /D SE_PORTAL_2=18 /D SE_PORTAL_TWO=18 /D SE_PORTALTWO=18 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ControlFlowGuard>false</ControlFlowGuard>
@@ -97,7 +99,7 @@
       <ProgramDataBaseFileName />
       <UseFullPaths>false</UseFullPaths>
       <ErrorReporting>None</ErrorReporting>
-      <AdditionalIncludeDirectories>.;$(AMTL);$(AMTL)\amtl;$(SOURCEPAWN)\include;$(SOURCEMOD)\public;$(MMSOURCE19)\core\sourcehook;$(MYSQL)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(AMTL);$(AMTL)\amtl;$(SP)\include;$(SM)\public;$(MMS)\core\sourcehook;$(MYSQL)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -108,7 +110,7 @@
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mswsock.lib;wsock32.lib;urlmon.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/EMITPOGOPHASEINFO %(AdditionalOptions)</AdditionalOptions>
       <LinkStatus>false</LinkStatus>
       <PreventDllBinding>true</PreventDllBinding>
@@ -125,8 +127,7 @@
       <CLRSupportLastError>Disabled</CLRSupportLastError>
       <CETCompat>true</CETCompat>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(CSGO)\lib\public;$(CSGO)\lib\win32\release\vs2017;$(CSGO)\lib\common;$(MYSQL)\lib\vs14</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <FixedBaseAddress>false</FixedBaseAddress>
