@@ -44,6 +44,7 @@ OFL += ../hl2sdk-csgo/lib/linux/*.so
 # LIB += ../hl2sdk-dods/lib/linux/dmxloader_i486.a
 # LIB += ../hl2sdk-dods/lib/linux/mathlib_i486.a
 LIB += ../hl2sdk-csgo/lib/linux/tier1_i486.a
+LIB += ../hl2sdk-csgo/lib/linux/mathlib_i486.a
 LIB += ../hl2sdk-csgo/lib/linux/interfaces_i486.a
 LIB += ../hl2sdk-csgo/lib/linux32/release/libprotobuf.a
 # LIB += libvstdlib_srv.so
@@ -59,6 +60,7 @@ DEF += -D_COMPILER_GCC
 DEF += -D_GCC
 DEF += -D_GEOIP_STATIC
 DEF += -D_GEOIPDATADIR=\"\"
+# DEF += -D_GLIBCXX_USE_CXX11_ABI=0
 DEF += -D_GNU
 DEF += -D_GNU_C
 DEF += -D_GNU_SOURCE
@@ -80,6 +82,7 @@ DEF += -DCOMPILER_GCC
 DEF += -DGCC
 DEF += -DGEOIP_STATIC
 DEF += -DGEOIPDATADIR=\"\"
+# DEF += -DGLIBCXX_USE_CXX11_ABI=0
 DEF += -DGNU
 DEF += -DGNU_C
 DEF += -DGNU_SOURCE
