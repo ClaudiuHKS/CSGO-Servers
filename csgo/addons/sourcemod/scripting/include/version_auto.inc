@@ -5,11 +5,11 @@
 #define _auto_version_included
 
 #define SOURCEMOD_V_TAG		""
-#define SOURCEMOD_V_CSET	"05aa3fd3"
+#define SOURCEMOD_V_CSET	"30a21608"
 #define SOURCEMOD_V_MAJOR	1
 #define SOURCEMOD_V_MINOR	12
 #define SOURCEMOD_V_RELEASE	0
-#define SOURCEMOD_V_REV		6921
+#define SOURCEMOD_V_REV		6974
 
-#define SOURCEMOD_VERSION	"1.12.0.6921"
+#define SOURCEMOD_VERSION	"1.12.0.6974"
     

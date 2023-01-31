@@ -1,0 +1,26 @@
+"NotifyRulesCvars"
+{
+    hgsm_version 1
+    metamod_version 1
+    mp_autoteambalance 1
+    mp_freezetime 1
+    mp_friendlyfire 1
+    mp_limitteams 1
+    mp_maxrounds 1
+    mp_roundtime 1
+    mp_timelimit 1
+    sourcemod_version 1
+    stripper_current_file 1
+    stripper_version 1
+    sv_accelerate 1
+    sv_alltalk 1
+    sv_bounce 1
+    sv_cheats 1
+    sv_competitive_minspec 1
+    sv_contact 1
+    sv_max_allowed_net_graph 1
+    sv_maxspeed 1
+    sv_steamgroup 1
+    sv_stopspeed 1
+    sv_tags 1
+}
