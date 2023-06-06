@@ -1,5 +1,0 @@
-"Metamod Plugin"
-{
-    "alias"     "update_linux_system"
-    "file"      "addons/update_linux_system/bin/update_linux_system_mm"
-}
